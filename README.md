@@ -52,11 +52,11 @@ OnCombatAction:Fire(LocalPlayer, "Slash", 45)
 
 ## 🚦 Choosing the Right Fire Mode
 
-Method,            |             Use Case,                           Internal Behavior
-Fire,              |             Default,Fastest.                    Uses the internal thread pool.
-FireSpawn,                       Isolation,                          Uses task.spawn. Safety first.
-FireDeferred,                    Optimization,                       Uses task.defer. Great for UI updates.
-
+| Mode           | Use Case                              | Internal Behavior                    |
+|----------------|----------------------------------------|--------------------------------------|
+| **Fire**       | Fastest, default option               | Uses internal thread pool            |
+| **FireSpawn**  | Isolation / safer execution           | Uses `task.spawn`                    |
+| **FireDeferred** | Optimized for UI updates & batching | Uses `task.defer`                    |
 ---
 
 ## 🛠 Technical Details
