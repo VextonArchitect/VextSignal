@@ -174,12 +174,6 @@ A high-performance, extensible signal system for Roblox (Luau), designed for hig
 
 ---
 
-## 🥀 Comment
-
-Made By Vext 💖
-
----
-
 ## 🧠 Summary
 
 | Aspect   | Description                    |
@@ -187,3 +181,9 @@ Made By Vext 💖
 | Purpose  | High-performance signal system |
 | Strength | Control + speed + scalability  |
 | Target   | High-frequency Roblox systems  |
+
+---
+
+## 🥀 Comment
+
+Made By Vext 💖
