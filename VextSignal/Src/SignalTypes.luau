@@ -1,49 +1,48 @@
 --!strict
 
--- Internal node structure used for the linked list.
--- Not intended for direct use by consumers.
+-- Internal node structure used for the prioritized linked list.
 export type Node<T...> = {
 	Connected: boolean,
 	Priority: number,
-	_next: any, -- Using 'any' to avoid recursive type depth issues in Luau
+	_signal: any,
+	_next: any,
 	_prev: any,
 	_fn: (T...) -> (),
 }
 
--- Public connection handle.
--- Simple interface for users to kill listeners.
+-- Public connection handle. Provides an interface to stop listening to events.
 export type Connection = {
 	Connected: boolean,
 	Disconnect: (self: Connection) -> (),
 }
 
--- The core Signal object.
--- Supports variadic generics for full type safety across projects.
+-- Core Signal Object.
+-- Efficiently manages event listeners with priority support and thread pooling.
 export type Signal<T...> = {
-	_handlerListHead: any, -- Pointer to the start of the prioritized list
+	_handlerListHead: any,
 
-	-- Hook a function to this signal. Optional priority for execution ordering.
+	-- Subscribes a handler to the signal.
 	Connect: (self: Signal<T...>, func: (T...) -> (), priority: number?) -> Connection,
 
-	-- Connects a listener that auto-disconnects after the first fire.
+	-- Subscribes a handler that automatically disconnects after one execution.
 	Once: (self: Signal<T...>, func: (T...) -> (), priority: number?) -> Connection,
 
-	-- Direct fire. Reuses threads to keep the scheduler happy.
+	-- Executes all handlers immediately using thread pooling.
 	Fire: (self: Signal<T...>, ...any) -> (),
 
-	-- Standard spawn fire. Good for when you need a fresh thread instantly.
+	-- Executes handlers using task.spawn (Fastest for single fires).
 	FireSpawn: (self: Signal<T...>, ...any) -> (),
 
-	-- Defers execution until the next cycle. Best for non-critical UI updates.
+	-- Schedules handlers to run at the end of the current frame.
 	FireDeferred: (self: Signal<T...>, ...any) -> (),
 
-	-- Yields the current thread until the next fire. Returns fired arguments.
+	-- Yields the current thread until the signal is fired.
 	Wait: (self: Signal<T...>) -> T...,
 
-	-- Clears all connections but keeps the signal object alive.
+	-- Disconnects all listeners.
 	DisconnectAll: (self: Signal<T...>) -> (),
 
-	-- Full cleanup. Signal becomes useless after this.
+	-- Cleans up the signal and its connections.
 	Destroy: (self: Signal<T...>) -> (),
 }
 
