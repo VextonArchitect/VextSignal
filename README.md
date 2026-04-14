@@ -1,58 +1,41 @@
-# Updated README
+# VextSignal Documentation
 
-## Introduction
-This project demonstrates the integration of various technologies.
+## Overview
 
-### Features
-- **Feature 1:** Description of feature 1.
-- **Feature 2:** Description of feature 2.
+VextSignal is a powerful signaling system that allows for easy event handling and communication between different parts of an application.
 
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/PearStudioOfficial/First-Project.git
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd First-Project
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
+## Features
+
+- **Easy to use:** VextSignal comes with a simple interface that makes it easy to create and manage signals.
+- **Flexible:** You can connect multiple listeners to a single signal and handle complex event flows.
 
 ## Usage
-To run the project, use the following command:
-```bash
-npm start
+
+```python
+from vextsignal import Signal
+
+# Create a signal
+signal = Signal()
+
+# Define a listener
+def listener(event):
+    print(f'Received event: {event}')
+
+# Connect listener to signal
+signal.connect(listener)
+
+# Emit the signal
+signal.emit('Hello World!')
 ```
 
-## API Endpoints
-| Endpoint   | Method | Description           |
-|------------|--------|-----------------------|
-| /api/data  | GET    | Retrieves data        |
-| /api/info  | POST   | Posts information     |
+## API Reference
 
-## Contributing
-1. Fork the repository.
-2. Create your feature branch:
-   ```bash
-   git checkout -b feature/AmazingFeature
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m 'Add some AmazingFeature'
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature/AmazingFeature
-   ```
-5. Open a pull request.
+| Method     | Description                                   |
+|------------|-----------------------------------------------|
+| `connect`  | Connects a listener to the signal.           |
+| `emit`     | Emits the signal, triggering all connected listeners. |
+| `disconnect`| Removes a listener from the signal.          | 
 
-## License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+## Conclusion
 
-## Acknowledgments
-- Inspiration
-- Code snippets
-- References 
+VextSignal provides a flexible and simple way to manage events in your application. For more information, check the [documentation](https://example.com/docs/example).
