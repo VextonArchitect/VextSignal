@@ -1,49 +1,51 @@
 --!strict
 
--- Internal node structure used for the prioritized linked list.
+-- internal node used in the priority-linked listener list
+-- represents a single connected callback in the signal chain
 export type Node<T...> = {
 	Connected: boolean,
 	Priority: number,
+
 	_signal: any,
 	_next: any,
 	_prev: any,
+
 	_fn: (T...) -> (),
 }
 
--- Public connection handle. Provides an interface to stop listening to events.
+-- connection handle returned to the user
+-- used to manually disconnect a listener from the signal
 export type Connection = {
 	Connected: boolean,
 	Disconnect: (self: Connection) -> (),
 }
 
--- Core Signal Object.
--- Efficiently manages event listeners with priority support and thread pooling.
+-- core signal object
+-- lightweight event system with priority ordering and multiple execution modes
 export type Signal<T...> = {
 	_handlerListHead: any,
 
-	-- Subscribes a handler to the signal.
+	-- attach a listener to the signal
 	Connect: (self: Signal<T...>, func: (T...) -> (), priority: number?) -> Connection,
 
-	-- Subscribes a handler that automatically disconnects after one execution.
+	-- attach a listener that runs only once then auto-disconnects
 	Once: (self: Signal<T...>, func: (T...) -> (), priority: number?) -> Connection,
 
-	-- Executes all handlers immediately using thread pooling.
+	-- fire all listeners immediately using coroutine pool execution
 	Fire: (self: Signal<T...>, ...any) -> (),
 
-	-- Executes handlers using task.spawn (Fastest for single fires).
+	-- fire listeners using task.spawn (parallel execution)
 	FireSpawn: (self: Signal<T...>, ...any) -> (),
 
-	-- Schedules handlers to run at the end of the current frame.
+	-- fire listeners using task.defer (next scheduler step)
 	FireDeferred: (self: Signal<T...>, ...any) -> (),
 
-	-- Yields the current thread until the signal is fired.
+	-- yield until the signal is fired and return received arguments
 	Wait: (self: Signal<T...>) -> T...,
 
-	-- Disconnects all listeners.
+	-- disconnect all listeners without destroying the signal
 	DisconnectAll: (self: Signal<T...>) -> (),
 
-	-- Cleans up the signal and its connections.
+	-- fully destroy signal and clean internal state
 	Destroy: (self: Signal<T...>) -> (),
 }
-
-return {}
