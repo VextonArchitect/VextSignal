@@ -1,4 +1,5 @@
 --!strict
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VextSignal = require(ReplicatedStorage.Shared)
 
@@ -6,10 +7,10 @@ print("\n[VextSignal]: Starting High-Load Performance Test...")
 print("--------------------------------------------------")
 
 local TestSignal = VextSignal.new()
-local ITERATIONS = 21000000 -- 21 Million iterations
+local ITERATIONS = 21000000 -- 21 million iterations
 local counter = 0
 
--- Simple listener
+-- basic listener used for measuring execution overhead
 TestSignal:Connect(function()
 	counter += 1
 end)
@@ -19,12 +20,16 @@ local function RunBenchmark()
 
 	local StartTime = os.clock()
 
+	-- core stress loop
+	-- repeatedly fires signal to measure raw dispatch performance
 	for i = 1, ITERATIONS do
 		TestSignal:Fire()
 	end
 
 	local EndTime = os.clock()
 	local Duration = EndTime - StartTime
+
+	-- performance metrics
 	local AvgLatency = Duration / ITERATIONS
 	local Throughput = math.floor(1 / AvgLatency)
 
@@ -36,9 +41,12 @@ local function RunBenchmark()
 	print("--------------------------------------------------")
 end
 
-task.wait(2) -- Engine settle
+-- allow engine to stabilize before benchmark starts
+task.wait(2)
+
 RunBenchmark()
 
+-- cleanup phase after benchmark completes
 task.delay(1, function()
 	TestSignal:Destroy()
 	print("[VextSignal]: Test completed. Memory cleared.")
