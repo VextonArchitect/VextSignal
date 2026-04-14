@@ -106,7 +106,7 @@ end)
 3. Require it:
 
 ```lua
-local Signal = require(ReplicatedStorage.Signal)
+local Signal = require(ReplicatedStorage.VextSignal)
 ```
 
 ---
