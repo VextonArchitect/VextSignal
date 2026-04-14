@@ -1,56 +1,58 @@
 --!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local VextSignal = require(ReplicatedStorage.Shared.Systems.VextSignal.Src.SignalService)
+local VextSignal = require(ReplicatedStorage.Shared)
 
-print("\n[VextSignal]: Starting high-load performance benchmark...")
+print("\n[VextSignal]: Starting High-Load Performance Test...")
 print("--------------------------------------------------")
 
--- Create test signal instance
+-- signal used for stress testing
 local TestSignal = VextSignal.new()
 
--- Number of iterations for stress test
-local ITERATIONS = 21_000_000 -- 21 million calls
+-- number of fire calls
+local ITERATIONS = 21000000 -- 21 million iterations
 
--- Simple counter to ensure execution is not optimized away
+-- simple counter to verify execution
 local counter = 0
 
--- Basic listener used for benchmarking signal execution cost
+-- minimal listener to reduce overhead noise
 TestSignal:Connect(function()
 	counter += 1
 end)
 
+-- main benchmark function
 local function RunBenchmark()
-	print(string.format("Firing signal %d times...", ITERATIONS))
+	print(string.format("Testing: Firing %d signals...", ITERATIONS))
 
-	local startTime = os.clock()
+	-- start timing
+	local StartTime = os.clock()
 
-	-- Main stress loop
-	for _ = 1, ITERATIONS do
-		TestSignal:Fire()
+	-- tight loop to measure raw throughput
+	for i = 1, ITERATIONS do
+		TestSignal:FireHyper()
 	end
 
-	local endTime = os.clock()
+	-- end timing
+	local EndTime = os.clock()
 
-	-- Performance calculations
-	local duration = endTime - startTime
-	local avgLatency = duration / ITERATIONS
-	local throughput = math.floor(1 / avgLatency)
+	local Duration = EndTime - StartTime
+	local AvgLatency = Duration / ITERATIONS
+	local Throughput = math.floor(1 / AvgLatency)
 
 	print("--------------------------------------------------")
-	print("Benchmark results:")
-	print(string.format(" > Total time:     %.6f seconds", duration))
-	print(string.format(" > Average latency: %.10f seconds", avgLatency))
-	print(string.format(" > Throughput:      %d ops/sec", throughput))
+	print("Results:")
+	print(string.format(" > Total Time:  %.6f seconds", Duration))
+	print(string.format(" > Avg Latency: %.8f seconds", AvgLatency))
+	print(string.format(" > Throughput:  %d ops/sec", Throughput))
 	print("--------------------------------------------------")
 end
 
--- Allow Roblox engine to stabilize before starting benchmark
+-- small delay to avoid startup interference
 task.wait(2)
 
 RunBenchmark()
 
--- Cleanup after benchmark to ensure no memory leaks remain
+-- cleanup after test
 task.delay(1, function()
 	TestSignal:Destroy()
-	print("[VextSignal]: Benchmark completed. Memory cleaned.")
+	print("[VextSignal]: Test completed. Memory cleared.")
 end)
