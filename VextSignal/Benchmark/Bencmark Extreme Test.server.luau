@@ -1,7 +1,6 @@
 --!strict
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
--- ensure correct module path for signal system
 local VextSignal = require(ReplicatedStorage.Shared)
 
 print("\n[VextSignal]: Initializing Benchmark extreme test...")
