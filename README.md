@@ -31,16 +31,43 @@ VextSignal is optimized to the theoretical limits of the Luau VM.
 
 ## ✨ Features & Roadmap
 
-| Feature | Status | Description |
-| :--- | :--- | :--- |
-| **Middleware API** | ✅ Live | Intercept, modify, or block signals (Analytics/Logging). |
-| **Argument Validation** | ✅ Live | Runtime type-checking for safer development. |
-| **Priority Connections**| ✅ Live | Ensure critical listeners fire before others. |
-| **Signal Groups** | ✅ Live | Batch disconnect multiple connections to prevent leaks. |
-| **Network Bridge** | ✅ Live | Unified API for Server-to-Client communication. |
-| **Profiler UI** | 🛠️ In Dev | A dedicated plugin to visualize signal stress in real-time. |
-| **Event Batching** | 📅 Planned | Groups high-frequency remote data into single packets. |
-| **Auto-Cleanup** | 📅 Planned | Automatic destruction of signals when instances are removed. |
+### 🟢 Available Now (Core Features)
+
+#### ⚙️ High-Velocity Middleware
+Full support for intercepting, modifying, or blocking signal execution.  
+Perfect for analytics, debugging, and gameplay control layers.
+
+---
+
+#### 🧪 Strict Type Validation
+Built-in runtime argument checking to maintain codebase integrity and prevent silent runtime bugs.
+
+---
+
+#### 🎯 Priority Execution
+Fine-grained control over listener execution order using priority-based dispatching.
+
+---
+
+#### 🧩 VextGroups
+Advanced memory management system with batch-disconnection capabilities for safe cleanup of connections.
+
+---
+
+#### 🌐 Cross-Boundary Bridge
+Unified API for seamless Server ↔ Client communication without changing usage patterns.
+
+---
+
+## 🚀 Future Development (Upcoming Milestones)
+
+| Feature            | Phase          | Description |
+|--------------------|---------------|-------------|
+| 🖥️ Visual Profiler UI | 🛠️ Development | Roblox Studio plugin for real-time signal stress monitoring and performance debugging |
+| 📦 Network Batching | 📅 Q3 2026     | Groups high-frequency remote calls into optimized packets to reduce network overhead |
+| 🧹 Intelli-Cleanup  | 📅 Q4 2026     | Automatically destroys signals and connections tied to removed Instances |
+| 🧠 Native Buffering | 💡 Research    | Internal buffering system designed for extreme-load scenarios to prevent frame drops |
+| 📊 Analytics Hooks  | 💡 Research    | Built-in integrations for external analytics systems to track gameplay events |
 
 ---
 
