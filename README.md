@@ -1,4 +1,4 @@
-# ⚡ VextSignal
+# ⚡VextSignal
 
 > High-performance, extensible signal system for Roblox
 
