@@ -38,7 +38,7 @@ Add this to your `default.project.json`:
 ```json
 "VextSignal": {
   "$path": "path/to/VextSignal"
-}
+},
 
 📖 Quick Start
 
