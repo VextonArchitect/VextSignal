@@ -36,7 +36,7 @@ local function RunBenchmark()
 	print("--------------------------------------------------")
 end
 
-task.wait(2) -- Let the engine settle
+task.wait(2) -- Engine settle
 RunBenchmark()
 
 task.delay(1, function()
