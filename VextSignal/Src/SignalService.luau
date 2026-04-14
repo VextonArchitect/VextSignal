@@ -20,7 +20,7 @@ local freeThreads: { thread } = {}
 local function runHandler(func: (...any) -> (), ...: any)
 	local result = { pcall(func, ...) }
 	if not result[1] then
-		warn(`[VextSignall Error]: {tostring(result[2])}`)
+		warn(`[VextSignal Error]: {tostring(result[2])}`)
 	end
 end
 
