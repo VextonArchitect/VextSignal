@@ -41,7 +41,7 @@ Add this to your `default.project
 
 ---
 
-##📖 Quick Start
+## 📖 Quick Start
 local Signal = require(path.to.VextSignal)
 
 -- Define a signal with specific types
@@ -56,7 +56,7 @@ OnCombatAction:Fire(LocalPlayer, "Slash", 45)
 
 ---
 
-##🚦 Choosing the Right Fire Mode
+## 🚦 Choosing the Right Fire Mode
 
 Method,                         Use Case,                           Internal Behavior
 Fire,                           Default,Fastest.                    Uses the internal thread pool.
@@ -65,7 +65,7 @@ FireDeferred,                   Optimization,                       Uses task.de
 
 ---
 
-##🛠 Technical Details
+## 🛠 Technical Details
 Linked List: Avoids table.remove performance traps.
 
 Variadic Packs: Optimized handling of table.pack/unpack.
@@ -74,7 +74,7 @@ Cleanup: Destroy() handles full garbage collection.
 
 ---
 
-##📄 License
+## 📄 License
 Licensed under the MIT License. Use it, break it, improve it.
 
   
