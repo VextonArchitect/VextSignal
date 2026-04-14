@@ -45,9 +45,9 @@ Optional runtime checks for signals. If enabled, it will throw an error if a scr
 3. 🌐 Native Bridge (Cross-Boundary Signals)
 A middleware system that allows a VextSignal to automatically wrap a RemoteEvent.
 
-Signal:FireClient(player, ...)
+`Signal:FireClient(player, ...)`
 
-Signal:FireAllClients(...)
+`Signal:FireAllClients(...)`
 
 Seamlessly handle the transition from server logic to client UI.
 
