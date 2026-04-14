@@ -125,12 +125,16 @@ group:DisconnectAll()
 
 ### 🛠 Why VextSignal?
 
-| Comparison     | VextSignal                 | BindableEvent        |
-|----------------|---------------------------|----------------------|
-| Performance    | 🔥 High Throughput        | ⚖️ Moderate          |
-| Middleware     | ✅ Supported              | ❌ No                |
-| Async Choice   | ✅ Spawn / Defer / Pool   | ❌ Forced            |
-| Debugging      | ✅ Built-in Profiler      | ❌ No                |
+| Comparison      | VextSignal                          | BindableEvent        |
+|----------------|-------------------------------------|----------------------|
+| Performance     | 🔥 High Throughput (optimized loops, pooling, no unnecessary allocations) | ⚖️ Moderate (Roblox-managed overhead) |
+| Middleware      | ✅ Supported (interceptors, hooks, analytics layers) | ❌ Not supported |
+| Async Choice    | ✅ Spawn / Defer / Pool / Secure / Hyper modes | ❌ Forced single execution model |
+| Debugging       | ✅ Built-in Profiler + runtime stats | ❌ No built-in tooling |
+| Priority System | ✅ Per-listener execution priority | ❌ Not available |
+| Memory Control  | ✅ Manual cleanup + VextGroups batch disconnect | ❌ GC-only lifecycle |
+| Scalability     | 🚀 Designed for high-frequency systems (combat, hitboxes, AI) | ⚖️ Limited under heavy event spam |
+| Execution Modes | ✅ Multiple (FireHyper / FireSecure / Fire / FireDeferred) | ❌ Only standard event firing |
 
 ---
 
