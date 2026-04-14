@@ -1,72 +1,184 @@
-# VextSignal ⚡
+# ⚡ VextSignal
 
 ![Luau](https://img.shields.io/badge/Luau-Strict-blue?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-Roblox-white?style=flat-square)
 
-> **VextSignal** is a high-performance, strictly typed signal implementation for Luau. Engineered for high-frequency systems where every microsecond matters.
+> **VextSignal** is a high-performance, strictly-typed Signal implementation for Luau, designed for systems where performance, scalability, and determinism matter.
 
 ---
 
-## 🚀 Why VextSignal?
+## 🚀 Overview
 
-Standard Roblox **BindableEvents** are heavy. VextSignal eliminates overhead by using a **custom thread pool** and direct reference passing.
+Roblox's built-in **BindableEvents** are convenient — but expensive.
 
-* ⚔️ **Hitbox Systems**
-* 🔄 **Custom Game Loops**
-* 🌐 **Networked State Management**
+**VextSignal** is built from the ground up to eliminate unnecessary overhead by using:
+
+* ⚡ Custom thread pooling
+* 🧠 Direct reference passing (no deep copies)
+* 📉 Minimal memory allocations
+
+> Result: predictable performance even under heavy load.
 
 ---
 
-## 💎 Core Pillars
+## 🎯 Use Cases
 
-### 🛡️ Strict Luau Typing
-Full support for generic variadic types `T...`. Get autocomplete and linting errors before you even hit "Play."
+VextSignal is ideal for:
+
+* ⚔️ Combat / Hitbox systems
+* 🔄 High-frequency game loops
+* 🌐 Networked state synchronization
+* 🎮 Core gameplay systems
+
+---
+
+## 💎 Key Features
+
+### 🛡️ Strict Typing (Luau)
+
+Full support for variadic generics (`T...`):
+
+```lua
+local Signal = require(path.to.VextSignal)
+
+local OnDamage = Signal.new<Player, number>()
+```
+
+* ✔ Autocomplete support
+* ✔ Compile-time validation
+* ✔ Safer APIs
+
+---
 
 ### ⚖️ Priority-Based Execution
-Use the `priority` parameter to ensure your data logic runs **before** your UI or VFX updates.
 
-### 🧵 Thread Re-use (Pooling)
-Reuses "sleeping" threads instead of spamming `task.spawn`, significantly cutting down on CPU spikes.
+Control execution order precisely:
 
-### ⚡ O(1) Disconnects
-Built on a doubly-linked list. Disconnecting is an instant operation regardless of the number of connections.
+```lua
+signal:Connect(callback, priority)
+```
 
+Higher priority callbacks execute first.
+
+---
+
+### 🧵 Thread Pooling
+
+Instead of spawning new threads:
+
+* 🔁 Reuses idle threads
+* 📉 Reduces CPU spikes
+* 🚀 Improves consistency
+
+---
+
+### ⚡ O(1) Disconnect
+
+Built on a **doubly-linked list**:
+
+* Instant disconnection
+* No array shifting
+* Scales efficiently
+
+---
+
+### 🧹 Memory Safety
+
+* Explicit `Destroy()` lifecycle
+* No hidden references
+* Predictable cleanup
 
 ---
 
 ## 📖 Quick Start
+
+```lua
 local Signal = require(path.to.VextSignal)
 
-Define a signal with specific types
+-- Create a signal
 local OnCombatAction = Signal.new<Player, string, number>()
 
-Connect with high priority
+-- Connect listener
 OnCombatAction:Connect(function(player, actionType, damage)
-    print(`Log: {player.Name} performed {actionType}`)
+    print(`{player.Name} used {actionType} dealing {damage} damage`)
 end, 100)
 
+-- Fire signal
 OnCombatAction:Fire(LocalPlayer, "Slash", 45)
+```
 
 ---
 
-## 🚦 Choosing the Right Fire Mode
+## 🚦 Fire Modes
 
-| Mode           | Use Case                              | Internal Behavior                    |
-|----------------|----------------------------------------|--------------------------------------|
-| **Fire**       | Fastest, default option               | Uses internal thread pool            |
-| **FireSpawn**  | Isolation / safer execution           | Uses `task.spawn`                    |
-| **FireDeferred** | Optimized for UI updates & batching | Uses `task.defer`                    |
+| Mode             | Description                        | Internal Behavior |
+| ---------------- | ---------------------------------- | ----------------- |
+| **Fire**         | Fastest, default execution         | Thread pool       |
+| **FireSpawn**    | Safe, isolated execution           | `task.spawn`      |
+| **FireDeferred** | Deferred execution (UI / batching) | `task.defer`      |
+
 ---
 
-## 🛠 Technical Details
-Linked List: Avoids table.remove performance traps.
+## 🛠 Implementation Details
 
-Variadic Packs: Optimized handling of table.pack/unpack.
+| System         | Description                                |
+| -------------- | ------------------------------------------ |
+| Linked List    | Efficient connection management            |
+| Variadic Packs | Optimized argument handling                |
+| Thread Pool    | Reuses execution threads                   |
+| Cleanup System | Ensures full garbage collection on destroy |
 
-Cleanup: Destroy() handles full garbage collection.
+---
+
+## 📊 Performance Philosophy
+
+> **"Do not allocate what you can reuse."**
+
+VextSignal minimizes:
+
+* Thread creation
+* Table allocations
+* Garbage collection pressure
+
+---
+
+## 📦 Installation
+
+### Manual
+
+Place the module inside `ReplicatedStorage` or your shared library folder.
+
+### Wally *(optional)*
+
+```toml
+VextSignal = "yourname/vextsignal@latest"
+```
+
+---
+
+## 🧪 Advanced Example
+
+```lua
+local signal = Signal.new<number>()
+
+-- High priority logic
+signal:Connect(function(value)
+    print("Core logic:", value)
+end, 100)
+
+-- Low priority UI
+signal:Connect(function(value)
+    print("UI update:", value)
+end, 0)
+
+signal:Fire(10)
+```
 
 ---
 
 ## 📄 License
-Licensed under the MIT License. Use it, break it, improve it.
+
+MIT License © 2026
+
+> Use it. Break it. Improve it.
