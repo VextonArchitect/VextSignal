@@ -1,7 +1,7 @@
 --!strict
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Signal = require(ReplicatedStorage.Shared)
+local Signal = require(ReplicatedStorage.Shared.Systems.VextSignal.Src.SignalService)
 
 local signal = Signal.new()
 
@@ -80,7 +80,7 @@ print("triggering sync fire (immediate):")
 signal:Fire()
 
 print("triggering firespawn (new thread):")
-signal:FireSpawn()
+signal:Fire()
 
 print("triggering firedeferred (next cycle):")
 signal:FireDeferred()
