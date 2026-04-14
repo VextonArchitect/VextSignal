@@ -1,7 +1,16 @@
 --!strict
 
--- internal node used in the priority-linked listener list
--- represents a single connected callback in the signal chain
+-- public connection handle
+-- represents a single listener attached to a signal
+export type Connection = {
+	Connected: boolean,
+
+	-- disconnects this listener from the signal
+	Disconnect: (self: Connection) -> (),
+}
+
+-- internal node used in the doubly linked list
+-- not intended for public use
 export type Node<T...> = {
 	Connected: boolean,
 	Priority: number,
@@ -10,42 +19,42 @@ export type Node<T...> = {
 	_next: any,
 	_prev: any,
 
-	_fn: (T...) -> (),
+	-- handler function (can be nil after disconnect for gc)
+	_fn: ((T...) -> ())?,
 }
 
--- connection handle returned to the user
--- used to manually disconnect a listener from the signal
-export type Connection = {
-	Connected: boolean,
-	Disconnect: (self: Connection) -> (),
-}
-
--- core signal object
--- lightweight event system with priority ordering and multiple execution modes
+-- main signal interface
+-- manages listeners and event dispatch
 export type Signal<T...> = {
-	_handlerListHead: any,
+	-- head of the internal linked list
+	_handlerListHead: Node<T...>?,
 
-	-- attach a listener to the signal
+	-- adds a listener with optional priority
 	Connect: (self: Signal<T...>, func: (T...) -> (), priority: number?) -> Connection,
 
-	-- attach a listener that runs only once then auto-disconnects
+	-- adds a listener that runs once and auto disconnects
 	Once: (self: Signal<T...>, func: (T...) -> (), priority: number?) -> Connection,
 
-	-- fire all listeners immediately using coroutine pool execution
-	Fire: (self: Signal<T...>, ...any) -> (),
+	-- fires using coroutine pool (balanced performance + safety)
+	FireSecure: (self: Signal<T...>, T...) -> (),
 
-	-- fire listeners using task.spawn (parallel execution)
-	FireSpawn: (self: Signal<T...>, ...any) -> (),
+	-- fires using task.spawn (fast, async)
+	Fire: (self: Signal<T...>, T...) -> (),
 
-	-- fire listeners using task.defer (next scheduler step)
-	FireDeferred: (self: Signal<T...>, ...any) -> (),
+	-- fires synchronously with pcall (lowest overhead, blocking)
+	FireHyper: (self: Signal<T...>, T...) -> (),
 
-	-- yield until the signal is fired and return received arguments
+	-- fires at end of frame using task.defer
+	FireDeferred: (self: Signal<T...>, T...) -> (),
+
+	-- yields until the signal fires and returns passed arguments
 	Wait: (self: Signal<T...>) -> T...,
 
-	-- disconnect all listeners without destroying the signal
+	-- disconnects all listeners
 	DisconnectAll: (self: Signal<T...>) -> (),
 
-	-- fully destroy signal and clean internal state
+	-- fully clears the signal and releases resources
 	Destroy: (self: Signal<T...>) -> (),
 }
+
+return {}
