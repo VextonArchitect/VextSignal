@@ -1,305 +1,117 @@
-# ⚡VextSignal
+# ⚡ VextSignal
 
-> High-performance, extensible signal system for Roblox
+> High-performance, extensible signal system for Roblox (Luau)
 
 ---
 
 ## 🚀 Overview
 
-**VextSignal** is a modern replacement for traditional event systems like BindableEvent.
-It is designed for **high-frequency gameplay systems** such as combat, hitboxes, AI, and networking.
+VextSignal is a high-performance replacement for Roblox BindableEvents and traditional signal systems.
 
-Built with performance, flexibility, and scalability in mind.
+It is designed for:
+- ⚔️ Combat systems
+- 🧠 AI systems
+- 🎯 Hitboxes
+- 🌐 Networking-heavy games
 
----
-
-## 🏆 World-Class Performance
-
-| Mode             | Execution Model | Speed        | Safety    | Latency     | Overhead    | Description                           |
-| ---------------- | --------------- | ------------ | --------- | ----------- | ----------- | ------------------------------------- |
-| **FireHyper**    | direct (pcall)  | 🔥 highest   | ⚠️ medium | ⚡ ultra low | 🟢 minimal  | direct execution without scheduler    |
-| **FireSecure**   | coroutine pool  | 🚀 very high | 🛡️ high  | ⚡ very low  | 🟡 low      | uses reusable threads (no spawn spam) |
-| **Fire**         | task.spawn      | ⚖️ medium    | 🛡️ high  | ⏳ medium    | 🟡 moderate | default Roblox async execution        |
-| **FireDeferred** | task.defer      | ⚖️ medium    | 🛡️ high  | ⏳ delayed   | 🟡 moderate | executes on next frame                |
+Built with:
+- Linked-list architecture
+- Coroutine pooling
+- Minimal allocations
+- Multiple execution modes
 
 ---
 
-| Test Case      | Total Calls | Time   | Throughput     |
-| -------------- | ----------- | ------ | -------------- |
-| **Extreme Test(Hyper)** | 90,092,700  | 9.97 s | ~9.03M ops/sec |
-| **Extreme Test(Secure)** | 29,062,500  | 8.75 s | ~3.32M ops/sec |
+## 🏆 Execution Modes
+
+| Mode | Execution Model | Speed | Safety | Latency | Description |
+|------|----------------|------|--------|---------|-------------|
+| FireHyper | direct pcall | 🔥 extreme | ⚠️ medium | ⚡ ultra low | Fastest execution, no scheduler |
+| FireSecure | coroutine pool | 🚀 very high | 🛡️ high | ⚡ low | Reusable threads, stable under load |
+| Fire | task.spawn | ⚖️ medium | 🛡️ high | ⏳ medium | Default Roblox async execution |
+| FireDeferred | task.defer | ⚖️ medium | 🛡️ high | ⏳ delayed | Runs on next frame |
 
 ---
 
-| Category          | Winner          | Why                            |
-| ----------------- | --------------- | ------------------------------ |
-| **Max Speed**     | 🥇 FireHyper    | no scheduler, no threads       |
-| **Best Balance**  | 🥇 FireSecure   | high speed + stable under load |
-| **Most Safe**     | 🥇 Fire         | Roblox default behavior        |
-| **Frame Control** | 🥇 FireDeferred | prevents frame spikes          |
+## 📊 Benchmark Results
 
-🧠 Quick Summary
-FireHyper → raw speed, no safety net
-FireSecure → optimized + stable
-Fire → simple and safe
-FireDeferred → delayed execution
+### 🔥 Extreme Stress Test
 
+| Metric | Result |
+|--------|--------|
+| Total Calls | 90,092,700 |
+| Execution Time | 9.97s |
+| Throughput | ~9.03M ops/sec |
+| Deep Invocations | 179,800 |
+| Self Destructs | 500 |
 
 ---
 
-## ✨ Features
+### 🧪 Secondary Benchmark
 
-### 📊 Built-in Debug Profiler
-
-A developer-only profiling system designed to monitor signal performance.
-
-* Tracks how often each signal is fired
-* Measures average execution time of listeners
-* Detects heavy handlers that may cause frame drops
-
-> Perfect for optimizing combat systems and real-time events.
+| Metric | Result |
+|--------|--------|
+| Total Calls | 29,062,500 |
+| Execution Time | 8.75s |
+| Throughput | ~3.32M ops/sec |
+| Deep Invocations | 58,000 |
+| Self Destructs | 500 |
 
 ---
 
-### 🛡️ Argument Validation Layer
+## 🧠 Interpretation
 
-Optional runtime validation for safer development.
-
-* Ensures correct argument types when firing signals
-* Throws clear errors on misuse
-* Helps catch bugs in non-strict environments
-
----
-
-### 🌐 Native Bridge (Cross-Boundary Signals)
-
-Seamless server ↔ client communication.
-
-```lua
-Signal:FireClient(player, ...)
-Signal:FireAllClients(...)
-```
-
-* Wraps RemoteEvent automatically
-* Keeps a consistent API across boundaries
+| Category | Winner | Reason |
+|----------|--------|--------|
+| Max Speed | FireHyper | No scheduler overhead |
+| Stability | FireSecure | Thread pooling |
+| Simplicity | Fire | Native Roblox model |
+| Frame control | FireDeferred | avoids frame spikes |
 
 ---
 
-### ⏳ Promise Integration
+## ⚡ Core Features
 
-Modern async workflows with Promise support.
-
-```lua
-Signal:WaitPromise():andThen(function(...)
-	print(...)
-end)
-```
-
-* Converts signals into Promises
-* Clean async chaining
+### 📊 Built-in Performance Design
+- Tracks high-frequency signals
+- Optimized for millions of calls/sec
+- Designed for combat-heavy systems
 
 ---
 
-### 🛠️ Signal Groups (Batch Disconnect)
-
-Efficient cleanup system.
-
-```lua
-Group:DisconnectAll()
-```
-
-* Group multiple signals or connections
-* Clean everything in one call
-* Prevent memory leaks
+### 🧵 Coroutine Pool System
+- Reuses threads instead of spawning new ones
+- Reduces GC pressure
+- Improves stability under load
 
 ---
 
-### 🔄 Middleware Support
-
-Intercept and extend signal behavior.
-
-```lua
-Signal:Use(function(next, ...)
-	print("Signal fired")
-	return next(...)
-end)
-```
-
-* Add logging, analytics, validation
-* Modify or block execution
-* Fully composable
+### 🛡️ Safe Execution Layer
+- Uses pcall isolation
+- Prevents one listener crash affecting others
+- Debug-friendly error logging
 
 ---
 
-## 📦 Installation
-
-### Option 1 — Manual
-
-1. Download the module
-2. Place it inside `ReplicatedStorage`
-3. Require it:
-
-```lua
-local Signal = require(ReplicatedStorage.VextSignal)
-```
-
----
-
-### Option 2 — Rojo / Wally (optional)
-
-*(Add your package manager instructions here if needed)*
-
----
-
-## 🧠 Basic Usage
-
-### Create a Signal
-
-```lua
-local signal = Signal.new()
-```
-
-### Connect
-
-```lua
-signal:Connect(function(value)
-	print("Received:", value)
-end)
-```
-
-### Fire
-
-```lua
-signal:Fire("Hello World")
-```
-
----
-
-## ⚡ Advanced Usage
-
-### Once
-
-```lua
-signal:Once(function()
-	print("Fired once")
-end)
-```
-
----
-
-### Wait
-
-```lua
-local value = signal:Wait()
-print(value)
-```
-
----
-
-### Priority
-
+### 🔄 Priority System
 ```lua
 signal:Connect(function()
-	print("High priority")
+	print("high priority")
 end, 10)
-```
+
+Listeners execute by priority order (highest first).
 
 ---
 
-### Async Fire
-
+### ⏳ Execution Variants
 ```lua
-signal:FireSpawn(...)
-signal:FireDeferred(...)
-```
+signal:Fire()         -- async spawn
+signal:FireSecure()   -- coroutine pool
+signal:FireHyper()    -- direct execution
+signal:FireDeferred()``` -- next fram
 
----
-
-## 🧩 Example (Hitbox System)
-
-```lua
-local hitbox = HitboxManager.new(character, settings)
-
-hitbox.OnHit:Connect(function(victim)
-	local hum = victim:FindFirstChildOfClass("Humanoid")
-	if hum then
-		hum:TakeDamage(10)
-	end
+--- 
+### 🎯 Once Listener
+signal:Once(function()
+	print("runs only once")
 end)
-```
-
----
-
-## ⚙️ Performance
-
-VextSignal is optimized for:
-
-* ⚡ High-frequency events (combat, hitboxes)
-* 🧵 Coroutine pooling
-* 🧠 Minimal allocations
-* 📉 Reduced overhead vs BindableEvent
-
----
-
-## 📚 Comparison
-
-| Feature         | VextSignal | BindableEvent |
-| --------------- | ---------- | ------------- |
-| Performance     | ⚡ High     | ⚖️ Medium     |
-| Priority        | ✅          | ❌             |
-| Middleware      | ✅          | ❌             |
-| Promise Support | ✅          | ❌             |
-| Debug Tools     | ✅          | ❌             |
-| Extensibility   | 🔥 Full    | ❌             |
-
----
-
-## 🛡️ Safety
-
-* Error isolation via `pcall`
-* Optional argument validation
-* Safe disconnect handling
-* No memory leaks when used correctly
-
----
-
-## 📌 Roadmap
-
-* [ ] Full profiler UI
-* [ ] Network replication layer
-* [ ] Event batching system
-* [ ] Built-in analytics hooks
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-* Open an issue
-* Submit a pull request
-* Suggest improvements
-
----
-
-## 📄 License
-
-MIT License
-
----
-
-## 💬 Final Notes
-
-VextSignal is built for developers who want **full control over their event systems**.
-
-If you're building:
-
-* ⚔️ Combat systems
-* 🧠 AI systems
-* 🌐 Networked gameplay
-
-Then this library is for you.
-
----
-
-**Made with 💙 by Vext**
