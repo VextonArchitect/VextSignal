@@ -174,11 +174,9 @@ A high-performance, extensible signal system for Roblox (Luau), designed for hig
 
 ---
 
-## 📄 License
+## 🥀 Comment
 
-| Type    | Value |
-| ------- | ----- |
-| License | MIT   |
+Made By Vext 💖
 
 ---
 
