@@ -1,4 +1,5 @@
 # VextSignal ⚡
+
 ![Luau](https://img.shields.io/badge/Luau-Strict-blue?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-Roblox-white?style=flat-square)
@@ -8,6 +9,7 @@
 ---
 
 ## 🚀 Why VextSignal?
+
 Standard Roblox **BindableEvents** are heavy. VextSignal eliminates overhead by using a **custom thread pool** and direct reference passing.
 
 * ⚔️ **Hitbox Systems**
@@ -40,7 +42,6 @@ Add this to your `default.project.json`:
 ```json
 "VextSignal": {
   "$path": "path/to/VextSignal"
-}
 
 ---
 
@@ -78,4 +79,6 @@ Cleanup: Destroy() handles full garbage collection.
 ---
 
 ##📄 License
-Licensed under the MIT License. Use it, break it, improve it
+Licensed under the MIT License. Use it, break it, improve it.
+
+  
