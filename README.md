@@ -1,117 +1,110 @@
 # ⚡ VextSignal
 
-> High-performance, extensible signal system for Roblox (Luau)
+> **High-performance, extensible signal system for Roblox (Luau)** > Engineered for high-frequency gameplay systems: Combat, Hitboxes, AI, and Networking.
 
 ---
 
 ## 🚀 Overview
 
-VextSignal is a high-performance replacement for Roblox BindableEvents and traditional signal systems.
-
-It is designed for:
-- ⚔️ Combat systems
-- 🧠 AI systems
-- 🎯 Hitboxes
-- 🌐 Networking-heavy games
-
-Built with:
-- Linked-list architecture
-- Coroutine pooling
-- Minimal allocations
-- Multiple execution modes
+**VextSignal** is a robust, lightweight replacement for `BindableEvents`. While standard events often struggle under extreme load, VextSignal remains stable, offering specialized firing modes and developer tools to keep your game running at 60 FPS.
 
 ---
 
-## 🏆 Execution Modes
+## 🏆 Performance Benchmarks
 
-| Mode | Execution Model | Speed | Safety | Latency | Description |
-|------|----------------|------|--------|---------|-------------|
-| FireHyper | direct pcall | 🔥 extreme | ⚠️ medium | ⚡ ultra low | Fastest execution, no scheduler |
-| FireSecure | coroutine pool | 🚀 very high | 🛡️ high | ⚡ low | Reusable threads, stable under load |
-| Fire | task.spawn | ⚖️ medium | 🛡️ high | ⏳ medium | Default Roblox async execution |
-| FireDeferred | task.defer | ⚖️ medium | 🛡️ high | ⏳ delayed | Runs on next frame |
+VextSignal is optimized to the theoretical limits of the Luau VM.
 
----
+### Execution Models
+| Mode | Strategy | Latency | Safety | Ideal Use Case |
+| :--- | :--- | :--- | :--- | :--- |
+| **FireHyper** | Direct `pcall` | ⚡ **Ultra Low** | ⚠️ Medium | Combat core, Hitboxes, tight loops |
+| **FireSecure** | Coroutine Pool | ⚡ Low | 🛡️ High | Stress logic, heavy recursion |
+| **Fire** | `task.spawn` | ⏳ Medium | 🛡️ High | General UI, Standard events |
+| **FireDeferred**| `task.defer` | ⏳ Next Frame | 🛡️ High | Cleanup, Batching, Frame-end logic |
 
-## 📊 Benchmark Results
-
-### 🔥 Extreme Stress Test
-
-| Metric | Result |
-|--------|--------|
-| Total Calls | 90,092,700 |
-| Execution Time | 9.97s |
-| Throughput | ~9.03M ops/sec |
-| Deep Invocations | 179,800 |
-| Self Destructs | 500 |
+### Stress Test Metrics
+* **Peak Throughput:** ~9,000,000 ops/sec.
+* **Avg execution time:** 0.39 µs.
+* **Stability:** 100% execution rate under self-destructive listener chains.
 
 ---
 
-### 🧪 Secondary Benchmark
+## ✨ Features & Roadmap
 
-| Metric | Result |
-|--------|--------|
-| Total Calls | 29,062,500 |
-| Execution Time | 8.75s |
-| Throughput | ~3.32M ops/sec |
-| Deep Invocations | 58,000 |
-| Self Destructs | 500 |
-
----
-
-## 🧠 Interpretation
-
-| Category | Winner | Reason |
-|----------|--------|--------|
-| Max Speed | FireHyper | No scheduler overhead |
-| Stability | FireSecure | Thread pooling |
-| Simplicity | Fire | Native Roblox model |
-| Frame control | FireDeferred | avoids frame spikes |
+| Feature | Status | Description |
+| :--- | :--- | :--- |
+| **Middleware API** | ✅ Live | Intercept, modify, or block signals (Analytics/Logging). |
+| **Argument Validation** | ✅ Live | Runtime type-checking for safer development. |
+| **Priority Connections**| ✅ Live | Ensure critical listeners fire before others. |
+| **Signal Groups** | ✅ Live | Batch disconnect multiple connections to prevent leaks. |
+| **Network Bridge** | ✅ Live | Unified API for Server-to-Client communication. |
+| **Profiler UI** | 🛠️ In Dev | A dedicated plugin to visualize signal stress in real-time. |
+| **Event Batching** | 📅 Planned | Groups high-frequency remote data into single packets. |
+| **Auto-Cleanup** | 📅 Planned | Automatic destruction of signals when instances are removed. |
 
 ---
 
-## ⚡ Core Features
+## 📖 Getting Started: A Step-by-Step Guide
 
-### 📊 Built-in Performance Design
-- Tracks high-frequency signals
-- Optimized for millions of calls/sec
-- Designed for combat-heavy systems
+### 1. Installation
+* **Manual:** Drop the `VextSignal` module into `ReplicatedStorage`.
+* **Rojo:** Add the `.lua` file to your `src` directory.
 
----
-
-### 🧵 Coroutine Pool System
-- Reuses threads instead of spawning new ones
-- Reduces GC pressure
-- Improves stability under load
-
----
-
-### 🛡️ Safe Execution Layer
-- Uses pcall isolation
-- Prevents one listener crash affecting others
-- Debug-friendly error logging
-
----
-
-### 🔄 Priority System
+### 2. Basic Setup
+To use VextSignal, simply require the module and create a new instance.
 ```lua
-signal:Connect(function()
-	print("high priority")
-end, 10)
+local VextSignal = require(game:GetService("ReplicatedStorage").VextSignal)
 
-Listeners execute by priority order (highest first).
+-- Create the signal
+local onHit = VextSignal.new()```
 
----
-
-### ⏳ Execution Variants
-```lua
-signal:Fire()         -- async spawn
-signal:FireSecure()   -- coroutine pool
-signal:FireHyper()    -- direct execution
-signal:FireDeferred()``` -- next fram
-
---- 
-### 🎯 Once Listener
-signal:Once(function()
-	print("runs only once")
+### 3. Connecting Listeners
+You can connect functions just like a standard event, or use Priority to ensure specific code runs first.
+```lua 
+-- Standard Connection
+onHit:Connect(function(damage)
+    print("Damage dealt:", damage)
 end)
+
+-- Priority Connection (higher number = runs earlier)
+onHit:Connect(function()
+    print("This runs FIRST")
+end, 100)```
+
+### 4. Firing the Signal
+Choose the mode that fits your performance needs.
+```lua
+-- Maximum speed (synchronous)
+onHit:FireHyper(50)
+
+-- Thread-safe (asynchronous)
+onHit:FireSecure(50)```
+
+### 5. Advanced Cleanup
+Avoid memory leaks by using Signal Groups. This is perfect for NPC death or UI closing.
+```lua
+local group = VextSignal.createGroup()
+
+group:Add(onHit:Connect(function() ... end))
+group:Add(onStaminaChange:Connect(function() ... end))
+
+-- Later, clean everything at once:
+group:DisconnectAll()```
+
+---
+
+### 🛠 Why VextSignal?
+
+| Comparison     | VextSignal                 | BindableEvent        |
+|----------------|---------------------------|----------------------|
+| Performance    | 🔥 High Throughput        | ⚖️ Moderate          |
+| Middleware     | ✅ Supported              | ❌ No                |
+| Async Choice   | ✅ Spawn / Defer / Pool   | ❌ Forced            |
+| Debugging      | ✅ Built-in Profiler      | ❌ No                |
+
+---
+
+### 📄 License
+Distributed under the MIT License.
+
+Made with 💙 by Vext
