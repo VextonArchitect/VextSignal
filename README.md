@@ -42,6 +42,8 @@ Add this to your `default.project.json`:
   "$path": "path/to/VextSignal"
 }
 
+---
+
 ##📖 Quick Start
 local Signal = require(path.to.VextSignal)
 
@@ -55,6 +57,8 @@ end, 100)
 
 OnCombatAction:Fire(LocalPlayer, "Slash", 45)
 
+---
+
 ##🚦 Choosing the Right Fire Mode
 
 Method,                         Use Case,                           Internal Behavior
@@ -62,12 +66,16 @@ Fire,                           Default,Fastest.                    Uses the int
 FireSpawn,                      Isolation,                          Uses task.spawn. Safety first.
 FireDeferred,                   Optimization,                       Uses task.defer. Great for UI updates.
 
+---
+
 ##🛠 Technical Details
 Linked List: Avoids table.remove performance traps.
 
 Variadic Packs: Optimized handling of table.pack/unpack.
 
 Cleanup: Destroy() handles full garbage collection.
+
+---
 
 ##📄 License
 Licensed under the MIT License. Use it, break it, improve it
