@@ -40,9 +40,20 @@ VextSignal is ideal for:
 Full support for variadic generics (`T...`):
 
 ```lua
+--!strict
 local Signal = require(path.to.VextSignal)
 
-local OnDamage = Signal.new<Player, number>()
+-- Define expected types for the signal
+-- In this case: (player: Player, message: string, cooldown: number)
+local chatSignal = Signal.new<Player, string, number>()
+
+chatSignal:Connect(function(player, message, cooldown)
+    -- Autocomplete and type-checking will work here!
+    print(player.Name .. ": " .. message)
+end)
+
+-- This will throw a Luau type error in your editor if arguments don't match!
+chatSignal:Fire(game.Players.LocalPlayer, "Hello!", 5)
 ```
 
 * ✔ Autocomplete support
@@ -56,7 +67,30 @@ local OnDamage = Signal.new<Player, number>()
 Control execution order precisely:
 
 ```lua
-signal:Connect(callback, priority)
+local Signal = require(path.to.VextSignal)
+local explosionSignal = Signal.new()
+
+-- Runs Last (Default priority is 0)
+explosionSignal:Connect(function()
+    print("3. Play explosion sound")
+end)
+
+-- Runs First (Priority 100)
+explosionSignal:Connect(function()
+    print("1. Calculate damage radius")
+end, 100)
+
+-- Runs Second (Priority 50)
+explosionSignal:Connect(function()
+    print("2. Destroy breakable parts")
+end, 50)
+
+explosionSignal:Fire()
+
+-- Output Order:
+-- 1. Calculate damage radius
+-- 2. Destroy breakable parts
+-- 3. Play explosion sound
 ```
 
 Higher priority callbacks execute first.
