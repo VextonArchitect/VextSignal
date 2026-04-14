@@ -32,17 +32,6 @@ Reuses "sleeping" threads instead of spamming `task.spawn`, significantly cuttin
 ### ⚡ O(1) Disconnects
 Built on a doubly-linked list. Disconnecting is an instant operation regardless of the number of connections.
 
----
-
-## 📦 Installation
-
-### Rojo
-Add this to your `default.project.json`:
-
-```json
-"VextSignal": {
-  "$path": "path/to/VextSignal"
-}
 
 ---
 
