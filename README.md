@@ -17,10 +17,10 @@ Built with performance, flexibility, and scalability in mind.
 
 | Mode             | Execution Model       | Performance | Latency      | Safety    | Memory Usage  | Behavior                          | Best Use Case                          |
 | ---------------- | --------------------- | ----------- | ------------ | --------- | ------------- | --------------------------------- | -------------------------------------- |
-| **FireHyper**    | Direct call (`pcall`) | 🔥 Maximum  | ⚡ Ultra low  | ⚠️ Medium | 🟢 Minimal    | Synchronous, blocking             | Hitboxes, combat core, tight loops     |
-| **FireSecure**   | Coroutine pool        | ⚡ Very high | ⚡ Low        | 🛡️ High  | 🟡 Controlled | Async with pooled threads         | Heavy systems, recursion, stress logic |
-| **Fire**         | `task.spawn`          | ⚖️ Medium   | ⏳ Medium     | 🛡️ High  | 🔴 Higher     | Async, new thread per call        | General gameplay, UI, standard events  |
-| **FireDeferred** | `task.defer`          | ⚖️ Medium   | ⏳ Next frame | 🛡️ High  | 🟡 Medium     | Deferred execution (end of frame) | UI updates, cleanup, batching          |
+| **FireHyper**    | Direct call (`pcall`) | 🔥 Maximum  | ⚡ Ultra low  | ⚠️ Medium| 🟢 Minimal    | Synchronous, blocking            | Hitboxes, combat core, tight loops     |
+| **FireSecure**   | Coroutine pool        | ⚡ Very high| ⚡ Low       | 🛡️ High  | 🟡 Controlled | Async with pooled threads        | Heavy systems, recursion, stress logic |
+| **Fire**         | `task.spawn`          | ⚖️ Medium   | ⏳ Medium     | 🛡️ High  | 🔴 Higher     | Async, new thread per call        | General gameplay, UI, standard events |
+| **FireDeferred** | `task.defer`          | ⚖️ Medium   | ⏳ Next frame | 🛡️ High  | 🟡 Medium     | Deferred execution (end of frame) | UI updates, cleanup, batching         |
 
 ---
 
