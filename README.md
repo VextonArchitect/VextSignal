@@ -1,13 +1,15 @@
 # VextSignal ⚡
+![Luau](https://img.shields.io/badge/Luau-Strict-blue?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+![Platform](https://img.shields.io/badge/Platform-Roblox-white?style=flat-square)
 
-> **VextSignal** is a high-performance, strictly typed signal implementation for Luau. While most libraries focus on simplicity, VextSignal is engineered for high-frequency systems where every microsecond and byte of memory matters.
+> **VextSignal** is a high-performance, strictly typed signal implementation for Luau. Engineered for high-frequency systems where every microsecond matters.
 
 ---
 
 ## 🚀 Why VextSignal?
-Standard Roblox **BindableEvents** are heavy. They serialize arguments, overhead the Task Scheduler, and offer zero type safety. 
+Standard Roblox **BindableEvents** are heavy. VextSignal eliminates overhead by using a **custom thread pool** and direct reference passing.
 
-VextSignal eliminates this by using a **custom thread pool** and direct reference passing, keeping your frame times consistent even under extreme load. It's built specifically for:
 * ⚔️ **Hitbox Systems**
 * 🔄 **Custom Game Loops**
 * 🌐 **Networked State Management**
@@ -17,16 +19,16 @@ VextSignal eliminates this by using a **custom thread pool** and direct referenc
 ## 💎 Core Pillars
 
 ### 🛡️ Strict Luau Typing
-Full support for generic variadic types `T...`. Get autocomplete and linting errors in VS Code or Studio before you even hit "Play."
+Full support for generic variadic types `T...`. Get autocomplete and linting errors before you even hit "Play."
 
 ### ⚖️ Priority-Based Execution
-Not all listeners are equal. Use the `priority` parameter to ensure your data logic runs **before** your UI or VFX updates.
+Use the `priority` parameter to ensure your data logic runs **before** your UI or VFX updates.
 
 ### 🧵 Thread Re-use (Pooling)
-Instead of spamming `task.spawn` and stressing the scheduler, VextSignal reuses "sleeping" threads. This significantly cuts down on CPU spikes.
+Reuses "sleeping" threads instead of spamming `task.spawn`, significantly cutting down on CPU spikes.
 
 ### ⚡ O(1) Disconnects
-Built on a doubly-linked list. Disconnecting a listener is an instant operation, regardless of whether you have 10 or 10,000 active connections.
+Built on a doubly-linked list. Disconnecting is an instant operation regardless of the number of connections.
 
 ---
 
@@ -38,7 +40,7 @@ Add this to your `default.project.json`:
 ```json
 "VextSignal": {
   "$path": "path/to/VextSignal"
-},
+}
 
 📖 Quick Start
 
@@ -69,9 +71,7 @@ FireDeferred,                  Optimization,Uses task.defer.         Perfect for
 
 Technical Details
 Linked List: Avoids the table.remove performance trap.
-
 Variadic Packs: Optimized handling of table.pack/unpack to prevent memory thrashing.
-
 Cleanup: Destroy() handles full garbage collection of all nodes and metadata.
 
 📄 License
