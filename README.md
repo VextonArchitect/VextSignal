@@ -39,11 +39,6 @@ Built on a doubly-linked list. Disconnecting is an instant operation regardless 
 ### Rojo
 Add this to your `default.project
 
-```json
-"VextSignal": {
-  "$path": "path/to/VextSignal"
-}
-
 ---
 
 ##📖 Quick Start
