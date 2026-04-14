@@ -4,46 +4,53 @@ local Types = require(script.Parent.SignalTypes)
 type Connection = Types.Connection
 type Signal<T...> = Types.Signal<T...>
 
--- Internal type used for strict member access inside the module
 type InternalNode = {
 	Connected: boolean,
 	Priority: number,
+	_signal: any,
 	_next: any,
 	_prev: any,
 	_fn: (...any) -> (),
 }
 
--- [ THREAD POOLING ] --
+-- Thread Pooling
 local freeThreads: { thread } = {}
+local MAX_POOL_SIZE = 128
 
--- Safely executes a handler and catches errors to prevent signal interruption.
+-- Executed in a separate thread to prevent one listener's error from crashing the whole Signal.
 local function runHandler(func: (...any) -> (), ...: any)
-	local result = { pcall(func, ...) }
-	if not result[1] then
-		warn(`[VextSignal Error]: {tostring(result[2])}`)
+	local ok, err = pcall(func, ...)
+	if not ok then
+		warn(`[VextSignal Error]: {tostring(err)}`)
 	end
 end
 
--- Thread loop: waits for a task, executes it, and returns to the pool.
+-- The loop that keeps threads alive for reuse.
 local function yieldLoop()
 	while true do
-		table.insert(freeThreads, coroutine.running())
+		local thread = coroutine.running()
+		table.insert(freeThreads, thread)
+		
 		local func: any, args: any = coroutine.yield()
 
 		if func and args then
 			local a = args :: { [number]: any, n: number }
 			runHandler(func, table.unpack(a, 1, a.n))
 		end
+		
+		-- If the pool is too large, let the thread die naturally to save memory.
+		if #freeThreads > MAX_POOL_SIZE then
+			break
+		end
 	end
 end
 
--- Retrieves an available thread or spawns a new one if necessary.
 local function getThread(): thread
 	if #freeThreads > 0 then
 		return table.remove(freeThreads) :: thread
 	end
 	local newThread = coroutine.create(yieldLoop)
-	coroutine.resume(newThread)
+	coroutine.resume(newThread) -- Initialize the loop
 	return newThread
 end
 
@@ -53,33 +60,37 @@ Signal.__index = Signal
 local Connection = {}
 Connection.__index = Connection
 
--- Creates a new Signal instance.
 function Signal.new<T...>(): Signal<T...>
 	return setmetatable({
 		_handlerListHead = nil,
 	}, Signal) :: any
 end
 
--- Disconnects a specific connection and updates the linked list.
+-- Disconnects the listener and cleans up references for the Garbage Collector.
 function Connection.Disconnect(self: any)
 	if not self.Connected then
 		return
 	end
 	self.Connected = false
 
+	local signal = self._signal
 	local prev = self._prev
 	local next = self._next
 
 	if prev then
-		if prev._handlerListHead == self then
-			prev._handlerListHead = next
-		else
-			prev._next = next
-		end
+		prev._next = next
+	elseif signal._handlerListHead == self then
+		signal._handlerListHead = next
 	end
+
 	if next then
 		next._prev = prev
 	end
+	
+	-- Nullify references to prevent memory leaks
+	self._signal = nil
+	self._prev = nil
+	self._next = nil
 end
 
 function Signal.Connect<T...>(self: Signal<T...>, func: (T...) -> (), priority: number?): Connection
@@ -87,15 +98,16 @@ function Signal.Connect<T...>(self: Signal<T...>, func: (T...) -> (), priority: 
 	local connection: InternalNode = {
 		Connected = true,
 		Priority = priority or 0,
+		_signal = selfAny,
 		_next = nil,
-		_prev = selfAny,
+		_prev = nil,
 		_fn = func :: any,
 	}
 	setmetatable(connection, Connection)
 
 	local head = selfAny._handlerListHead :: InternalNode?
 
-	-- Insert node based on priority (Descending order)
+	-- Insert node into prioritized linked list (Descending order)
 	if not head or connection.Priority > head.Priority then
 		connection._next = head
 		if head then
@@ -107,6 +119,7 @@ function Signal.Connect<T...>(self: Signal<T...>, func: (T...) -> (), priority: 
 		while current._next and (current._next :: InternalNode).Priority >= connection.Priority do
 			current = current._next :: InternalNode
 		end
+		
 		connection._next = current._next
 		if current._next then
 			(current._next :: InternalNode)._prev = connection
@@ -126,7 +139,11 @@ function Signal.Fire<T...>(self: Signal<T...>, ...: any)
 	while item do
 		local nextItem = item._next
 		if item.Connected then
-			coroutine.resume(getThread(), item._fn, args)
+			-- Using thread pooling for optimal performance
+			local ok, err = coroutine.resume(getThread(), item._fn, args)
+			if not ok then
+				warn(`[VextSignal Critical]: Failed to resume thread: {tostring(err)}`)
+			end
 		end
 		item = nextItem
 	end
@@ -140,6 +157,7 @@ function Signal.FireSpawn<T...>(self: Signal<T...>, ...: any)
 	while item do
 		local nextItem = item._next
 		if item.Connected then
+			-- Uses task.spawn for immediate execution in a new thread
 			task.spawn(item._fn, table.unpack(args, 1, args.n))
 		end
 		item = nextItem
@@ -155,6 +173,7 @@ function Signal.FireDeferred<T...>(self: Signal<T...>, ...: any)
 		local nextItem = item._next
 		if item.Connected then
 			local fn = item._fn
+			-- Defers execution to the next engine step
 			task.defer(function()
 				runHandler(fn, table.unpack(args, 1, args.n))
 			end)
@@ -168,9 +187,7 @@ function Signal.Once<T...>(self: Signal<T...>, func: (T...) -> (), priority: num
 	local fired = false
 
 	connection = self:Connect(function(...: any)
-		if fired then
-			return
-		end
+		if fired then return end
 		fired = true
 		connection:Disconnect()
 		func(...)
@@ -183,12 +200,14 @@ function Signal.Wait<T...>(self: Signal<T...>): T...
 	local runningThread = coroutine.running()
 
 	self:Once(function(...: any)
+		-- Resume the waiting thread with passed arguments
 		task.spawn(runningThread, ...)
 	end)
 
 	return coroutine.yield()
 end
 
+-- Disconnects all active listeners without destroying the Signal object.
 function Signal.DisconnectAll<T...>(self: Signal<T...>)
 	local selfAny: any = self
 	local item = selfAny._handlerListHead :: InternalNode?
@@ -199,6 +218,7 @@ function Signal.DisconnectAll<T...>(self: Signal<T...>)
 	selfAny._handlerListHead = nil
 end
 
+-- Completely cleans up the Signal.
 function Signal.Destroy<T...>(self: Signal<T...>)
 	self:DisconnectAll()
 	setmetatable(self, nil)
