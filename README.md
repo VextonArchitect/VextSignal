@@ -96,16 +96,19 @@ Built on a **doubly-linked list**:
 ```lua
 local Signal = require(path.to.VextSignal)
 
--- Create a signal
-local OnCombatAction = Signal.new<Player, string, number>()
+-- Create a new signal (supports Luau generics for type safety)
+local mySignal = Signal.new<string, number>()
 
--- Connect listener
-OnCombatAction:Connect(function(player, actionType, damage)
-    print(`{player.Name} used {actionType} dealing {damage} damage`)
-end, 100)
+-- Connect a listener
+local connection = mySignal:Connect(function(name, score)
+    print(string.format("Player %s scored %d points!", name, score))
+end)
 
--- Fire signal
-OnCombatAction:Fire(LocalPlayer, "Slash", 45)
+-- Fire the signal
+mySignal:Fire("Vexton", 1500)
+
+-- Disconnect when no longer needed
+connection:Disconnect()
 ```
 
 ---
@@ -160,19 +163,42 @@ VextSignal = "yourname/vextsignal@latest"
 ## 🧪 Advanced Example
 
 ```lua
-local signal = Signal.new<number>()
+local Signal = require(path.to.VextSignal)
 
--- High priority logic
-signal:Connect(function(value)
-    print("Core logic:", value)
+-- Defining a complex signal for a Combat System
+local OnHit = Signal.new<Model, number, boolean>() -- Target, Damage, IsCritical
+
+-- 1. High Priority: Logic that must run BEFORE damage (e.g., Shield/Invulnerability check)
+OnHit:Connect(function(target, damage)
+    print("Priority 100: Checking defensive buffs for", target.Name)
 end, 100)
 
--- Low priority UI
-signal:Connect(function(value)
-    print("UI update:", value)
+-- 2. Normal Priority: Visual effects and Sound
+OnHit:Connect(function(_, _, isCrit)
+    if isCrit then
+        print("Priority 0: Playing Critical Hit sound effect!")
+    end
 end, 0)
 
-signal:Fire(10)
+-- 3. The 'Once' Pattern: Useful for achievement or first-blood logic
+OnHit:Once(function()
+    print("First Blood! Someone took damage for the first time.")
+end)
+
+-- 4. Using Wait() in a separate thread (e.g., for a cinematic or combo sequence)
+task.spawn(function()
+    print("Sequence: Waiting for the next hit...")
+    local target, damage = OnHit:Wait()
+    print("Sequence: Recorded a hit of " .. damage .. " on " .. target.Name)
+end)
+
+-- Simulated combat event
+task.wait(1)
+OnHit:Fire(workspace.EnemyDummy, 45, true)
+
+-- Cleanup: Destroy the signal when the weapon/NPC is removed
+-- This will automatically disconnect all remaining listeners.
+-- OnHit:Destroy()
 ```
 
 ---
