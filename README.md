@@ -55,7 +55,8 @@ To use VextSignal, simply require the module and create a new instance.
 ```lua
 local VextSignal = require(game:GetService("ReplicatedStorage").VextSignal)
 -- Create the signal
-local onHit = VextSignal.new()```
+local onHit = VextSignal.new()
+```
 
 ### 3. Connecting Listeners
 You can connect functions just like a standard event, or use Priority to ensure specific code runs first.
@@ -63,12 +64,13 @@ You can connect functions just like a standard event, or use Priority to ensure 
 -- Standard Connection
 onHit:Connect(function(damage)
     print("Damage dealt:", damage)
-end)```
+end)
 
 -- Priority Connection (higher number = runs earlier)
 onHit:Connect(function()
     print("This runs FIRST")
-end, 100)```
+end, 100)
+```
 
 ### 4. Firing the Signal
 Choose the mode that fits your performance needs.
@@ -77,7 +79,8 @@ Choose the mode that fits your performance needs.
 onHit:FireHyper(50)
 
 -- Thread-safe (asynchronous)
-onHit:FireSecure(50)```
+onHit:FireSecure(50)
+```
 
 ### 5. Advanced Cleanup
 Avoid memory leaks by using Signal Groups. This is perfect for NPC death or UI closing.
@@ -88,7 +91,8 @@ group:Add(onHit:Connect(function() ... end))
 group:Add(onStaminaChange:Connect(function() ... end))
 
 -- Later, clean everything at once:
-group:DisconnectAll()```
+group:DisconnectAll()
+```
 
 ---
 
