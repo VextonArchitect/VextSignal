@@ -64,7 +64,7 @@ You can connect functions just like a standard event, or use Priority to ensure 
 -- Standard Connection
 onHit:Connect(function(damage)
     print("Damage dealt:", damage)
-end)
+end)```
 
 -- Priority Connection (higher number = runs earlier)
 onHit:Connect(function()
