@@ -37,17 +37,22 @@ Built on a doubly-linked list. Disconnecting is an instant operation regardless 
 ## 📦 Installation
 
 ### Rojo
-Add this to your `default.project
+Add this to your `default.project.json`:
+
+```json
+"VextSignal": {
+  "$path": "path/to/VextSignal"
+}
 
 ---
 
 ## 📖 Quick Start
 local Signal = require(path.to.VextSignal)
 
--- Define a signal with specific types
+Define a signal with specific types
 local OnCombatAction = Signal.new<Player, string, number>()
 
--- Connect with high priority
+Connect with high priority
 OnCombatAction:Connect(function(player, actionType, damage)
     print(`Log: {player.Name} performed {actionType}`)
 end, 100)
