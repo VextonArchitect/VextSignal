@@ -40,19 +40,20 @@ Add this to your `default.project.json`:
 ```json
 "VextSignal": {
   "$path": "path/to/VextSignal"
-}
+}:
 
 ###📖 Quick Start
-
 local Signal = require(path.to.VextSignal)
 
--- Define a signal with specific types for maximum safety
+-- Define a signal with specific types
 local OnCombatAction = Signal.new<Player, string, number>()
 
--- Connect with high priority (runs first)
+-- Connect with high priority
 OnCombatAction:Connect(function(player, actionType, damage)
     print(`Log: {player.Name} performed {actionType}`)
 end, 100)
+
+OnCombatAction:Fire(LocalPlayer, "Slash", 45)
 
 -- Standard connection
 OnCombatAction:Connect(function(player, actionType, damage)
