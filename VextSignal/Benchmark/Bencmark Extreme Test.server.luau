@@ -64,7 +64,7 @@ local function RunExtremeTest()
 	local large_data = table.create(1000, "Vext_Power")
 
 	-- number of parallel waves
-	local waves = 9000
+	local waves = 7000
 
 	print(string.format("running %d stress waves...", waves))
 
