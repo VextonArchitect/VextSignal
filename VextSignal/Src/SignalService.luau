@@ -1,121 +1,115 @@
 --!strict
-
 local Types = require(script.Parent.SignalTypes)
 
-type Connection = Types.Connection
-type Signal<T...> = Types.Signal<T...>
+export type Connection = Types.Connection
+export type Signal<T...> = Types.Signal<T...>
+type InternalNode = Types.Node<any>
 
-type InternalNode = {
-	Connected: boolean,
-	Priority: number,
-	_signal: any,
-	_next: any,
-	_prev: any,
-	_fn: (...any) -> (),
-}
-
--- coroutine pool for reusing threads and reducing allocations
+-- configuration
+local MAX_POOL_SIZE = 512
 local freeThreads: { thread } = {}
-local MAX_POOL_SIZE = 128
 
--- safely executes a handler so one failure doesn't break signal chain
-local function runHandler(func: (...any) -> (), ...: any)
-	local ok, err = pcall(func, ...)
-	if not ok then
-		warn(`[VextSignal Error]: {tostring(err)}`)
+-- runs handler safely so one error does not break the whole signal
+local function runHandler(func: (...any) -> (), args: { any }, argCount: number)
+	local success, fault = pcall(func :: any, table.unpack(args, 1, argCount))
+	if not success then
+		warn(string.format("[VextSignal Error]: %s\n%s", tostring(fault), debug.traceback()))
 	end
 end
 
--- worker loop used by pooled coroutines
--- waits for assigned work and executes it safely
+-- coroutine loop reused by the thread pool
 local function yieldLoop()
+	local currentThread = coroutine.running()
+
 	while true do
-		local thread = coroutine.running()
-		table.insert(freeThreads, thread)
+		local func, args, argCount = coroutine.yield()
 
-		local func, args = coroutine.yield()
-
-		if func and args then
-			local a = args :: { [number]: any, n: number }
-			runHandler(func, table.unpack(a, 1, a.n))
+		if func then
+			runHandler(func, args, argCount)
 		end
 
-		-- prevents unbounded growth of coroutine pool
-		if #freeThreads > MAX_POOL_SIZE then
+		-- return thread to pool or kill it if pool is full
+		if #freeThreads < MAX_POOL_SIZE then
+			table.insert(freeThreads, currentThread)
+		else
 			break
 		end
 	end
 end
 
--- gets a reusable coroutine or creates a new one if pool is empty
+-- gets a reusable coroutine or creates a new one
 local function getThread(): thread
-	if #freeThreads > 0 then
-		return table.remove(freeThreads) :: thread
+	local t: thread? = table.remove(freeThreads)
+
+	if not t or coroutine.status(t) == "dead" then
+		local newThread = coroutine.create(yieldLoop)
+		t = newThread
+		coroutine.resume(newThread)
 	end
 
-	local newThread = coroutine.create(yieldLoop)
-	coroutine.resume(newThread)
-	return newThread
+	return t :: thread
 end
 
-local Signal = {}
-Signal.__index = Signal
-
+-- connection object
 local Connection = {}
 Connection.__index = Connection
 
-function Signal.new<T...>(): Signal<T...>
-	return setmetatable({
-		_handlerListHead = nil,
-	}, Signal) :: any
-end
-
--- removes connection from signal linked list and cleans references
 function Connection.Disconnect(self: any)
-	if not self.Connected then
+	if not (self and self.Connected) then
 		return
 	end
 
 	self.Connected = false
 
 	local signal = self._signal
-	local prev = self._prev
-	local next = self._next
+	local prev = self._prev :: InternalNode?
+	local next = self._next :: InternalNode?
 
 	if prev then
 		prev._next = next
-	elseif signal._handlerListHead == self then
-		signal._handlerListHead = next
+	elseif signal and (signal :: any)._handlerListHead == self then
+		(signal :: any)._handlerListHead = next
 	end
 
 	if next then
 		next._prev = prev
 	end
 
-	-- clear references for garbage collector safety
+	-- clear references for gc
 	self._signal = nil
 	self._prev = nil
 	self._next = nil
+	self._fn = nil
 end
 
--- connects a listener with optional priority ordering
-function Signal.Connect<T...>(self: Signal<T...>, func: (T...) -> (), priority: number?): Connection
-	local selfAny: any = self
+-- signal object
+local Signal = {}
+Signal.__index = Signal
 
+function Signal.new<T...>(): Signal<T...>
+	return setmetatable({
+		_handlerListHead = nil,
+		_firing = false, -- reserved for re-entrancy protection
+	}, Signal) :: any
+end
+
+function Signal.Connect<T...>(self: any, func: (T...) -> (), priority: number?): Connection
 	local connection: InternalNode = {
 		Connected = true,
 		Priority = priority or 0,
-		_signal = selfAny,
+		_signal = self,
 		_next = nil,
 		_prev = nil,
-		_fn = func :: any,
+		_fn = func :: (...any) -> (),
+		Disconnect = Connection.Disconnect,
 	}
 
-	setmetatable(connection, Connection)
+	setmetatable(connection :: any, Connection)
 
+	local selfAny = self :: any
 	local head = selfAny._handlerListHead :: InternalNode?
 
-	-- insert into linked list sorted by priority (high first)
+	-- insert into doubly linked list sorted by priority
 	if not head or connection.Priority > head.Priority then
 		connection._next = head
 		if head then
@@ -123,14 +117,13 @@ function Signal.Connect<T...>(self: Signal<T...>, func: (T...) -> (), priority: 
 		end
 		selfAny._handlerListHead = connection
 	else
-		local current = head
+		local current: InternalNode = head
 
 		while current._next and (current._next :: InternalNode).Priority >= connection.Priority do
 			current = current._next :: InternalNode
 		end
 
 		connection._next = current._next
-
 		if current._next then
 			(current._next :: InternalNode)._prev = connection
 		end
@@ -142,19 +135,57 @@ function Signal.Connect<T...>(self: Signal<T...>, func: (T...) -> (), priority: 
 	return (connection :: any) :: Connection
 end
 
--- fires all listeners using coroutine pool execution
-function Signal.Fire<T...>(self: Signal<T...>, ...: any)
-	local selfAny: any = self
-	local item = selfAny._handlerListHead :: InternalNode?
-	local args = table.pack(...)
+-- fire using coroutine pool (safe mode)
+local function FireSecure(self: any, ...: any)
+	local item = self._handlerListHead :: InternalNode?
+	if not item then
+		return
+	end
+
+	local args: any = table.pack(...)
+	local count = args.n
 
 	while item do
 		local nextItem = item._next
+		local fn = item._fn
 
-		if item.Connected then
-			local ok, err = coroutine.resume(getThread(), item._fn, args)
-			if not ok then
-				warn(`[VextSignal Critical]: Failed to resume thread: {tostring(err)}`)
+		if item.Connected and fn then
+			coroutine.resume(getThread(), fn, args, count)
+		end
+
+		item = nextItem
+	end
+end
+(Signal :: any).FireSecure = FireSecure
+
+-- fire using task.spawn (fast, no table allocations)
+function Signal.Fire<T...>(self: any, ...: T...)
+	local item = (self :: any)._handlerListHead :: InternalNode?
+
+	while item do
+		local nextItem = item._next
+		local fn = item._fn
+
+		if item.Connected and fn then
+			task.spawn(fn :: any, ...)
+		end
+
+		item = nextItem
+	end
+end
+
+-- fire using pcall (synchronous safe execution)
+function Signal.FireHyper<T...>(self: any, ...: T...)
+	local item = (self :: any)._handlerListHead :: InternalNode?
+
+	while item do
+		local nextItem = item._next
+		local fn = item._fn
+
+		if item.Connected and fn then
+			local success, err = pcall(fn :: any, ...)
+			if not success then
+				warn("[VextSignal Hyper Error]: " .. tostring(err))
 			end
 		end
 
@@ -162,51 +193,38 @@ function Signal.Fire<T...>(self: Signal<T...>, ...: any)
 	end
 end
 
--- fires all listeners using task.spawn (parallel execution)
-function Signal.FireSpawn<T...>(self: Signal<T...>, ...: any)
-	local selfAny: any = self
-	local item = selfAny._handlerListHead :: InternalNode?
-	local args = table.pack(...)
+-- fire at end of frame
+local function FireDeferred(self: any, ...: any)
+	local item = self._handlerListHead :: InternalNode?
+	if not item then
+		return
+	end
+
+	local args: any = table.pack(...)
+	local count = args.n
 
 	while item do
 		local nextItem = item._next
+		local fn = item._fn
 
-		if item.Connected then
-			task.spawn(item._fn, table.unpack(args, 1, args.n))
+		if item.Connected and fn then
+			task.defer(runHandler :: any, fn :: any, args, count)
 		end
 
 		item = nextItem
 	end
 end
+(Signal :: any).FireDeferred = FireDeferred
 
--- fires listeners at end of frame using task.defer
-function Signal.FireDeferred<T...>(self: Signal<T...>, ...: any)
-	local selfAny: any = self
-	local item = selfAny._handlerListHead :: InternalNode?
-	local args = table.pack(...)
-
-	while item do
-		local nextItem = item._next
-
-		if item.Connected then
-			local fn = item._fn
-
-			task.defer(function()
-				runHandler(fn, table.unpack(args, 1, args.n))
-			end)
-		end
-
-		item = nextItem
-	end
-end
-
--- connects a listener that auto-disconnects after first call
-function Signal.Once<T...>(self: Signal<T...>, func: (T...) -> (), priority: number?): Connection
+-- connects a handler that runs once
+function Signal.Once<T...>(self: any, func: (T...) -> (), priority: number?): Connection
 	local connection: Connection
 	local fired = false
 
-	connection = self:Connect(function(...: any)
-		if fired then return end
+	connection = (self :: Signal<T...>):Connect(function(...: T...)
+		if fired then
+			return
+		end
 		fired = true
 		connection:Disconnect()
 		func(...)
@@ -215,34 +233,37 @@ function Signal.Once<T...>(self: Signal<T...>, func: (T...) -> (), priority: num
 	return connection
 end
 
--- yields current thread until signal is fired
-function Signal.Wait<T...>(self: Signal<T...>): T...
-	local runningThread = coroutine.running()
+-- yields until signal fires
+function Signal.Wait<T...>(self: any): T...
+	local runningThread = coroutine.running();
 
-	self:Once(function(...)
+	(self :: any):Once(function(...: any)
 		task.spawn(runningThread, ...)
 	end)
 
 	return coroutine.yield()
 end
 
--- removes all listeners without destroying object
-function Signal.DisconnectAll<T...>(self: Signal<T...>)
-	local selfAny: any = self
-	local item = selfAny._handlerListHead :: InternalNode?
+-- disconnects all listeners
+function Signal.DisconnectAll(self: any)
+	local item = (self :: any)._handlerListHead :: InternalNode?
 
 	while item do
+		local nextItem = item._next
 		item.Connected = false
-		item = item._next
+		item._fn = nil
+		item._prev = nil
+		item._next = nil
+		item = nextItem
 	end
 
-	selfAny._handlerListHead = nil
+	(self :: any)._handlerListHead = nil
 end
 
--- fully destroys signal and clears connections
-function Signal.Destroy<T...>(self: Signal<T...>)
-	self:DisconnectAll()
-	setmetatable(self, nil)
+-- destroys the signal
+function Signal.Destroy(self: any)
+	(self :: any):DisconnectAll()
+	setmetatable(self :: any, nil)
 end
 
 return Signal :: any
