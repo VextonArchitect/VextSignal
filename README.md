@@ -15,14 +15,30 @@ Built with performance, flexibility, and scalability in mind.
 
 ## 🏆 World-Class Performance
 
-`VextSignal` has been pushed to the practical limits of the Luau VM under extreme stress conditions.
+| Mode             | Execution Model       | Performance | Latency      | Safety    | Memory Usage  | Behavior                          | Best Use Case                          |
+| ---------------- | --------------------- | ----------- | ------------ | --------- | ------------- | --------------------------------- | -------------------------------------- |
+| **FireHyper**    | Direct call (`pcall`) | 🔥 Maximum  | ⚡ Ultra low  | ⚠️ Medium | 🟢 Minimal    | Synchronous, blocking             | Hitboxes, combat core, tight loops     |
+| **FireSecure**   | Coroutine pool        | ⚡ Very high | ⚡ Low        | 🛡️ High  | 🟡 Controlled | Async with pooled threads         | Heavy systems, recursion, stress logic |
+| **Fire**         | `task.spawn`          | ⚖️ Medium   | ⏳ Medium     | 🛡️ High  | 🔴 Higher     | Async, new thread per call        | General gameplay, UI, standard events  |
+| **FireDeferred** | `task.defer`          | ⚖️ Medium   | ⏳ Next frame | 🛡️ High  | 🟡 Medium     | Deferred execution (end of frame) | UI updates, cleanup, batching          |
 
-- **Stress Test Peak:** 31,968,671 total signal calls in a single session  
-- **Chaos Throughput:** 3.69M ops/sec under recursive and mutation-heavy workloads  
-- **Stability:** 100% successful execution under dynamic listener modification and self-destructive chains  
-- **Latency:** ~0.39 µs average execution time under high load  
+---
 
-> "Designed for systems that operate under extreme event pressure. From large-scale combat engines to high-frequency gameplay loops, VextSignal maintains stability without breakdown under stress conditions."
+| Test Scenario        | Total Calls | Execution Time | Throughput         |
+| -------------------- | ----------- | -------------- | ------------------ |
+| Extreme Test (Run 1) | 90,092,700  | 9.96 s         | ~9,000,000 ops/sec |
+| Extreme Test (Run 2) | 29,062,500  | 8.75 s         | ~3,300,000 ops/sec |
+
+---
+
+| Category      | Best Mode      |
+| ------------- | -------------- |
+| Max Speed     | 🔥 FireHyper   |
+| Best Balance  | ⚡ FireSecure   |
+| Default Safe  | ⚙️ Fire        |
+| Delayed Logic | ⏳ FireDeferred |
+
+---
 
 ## ✨ Features
 
