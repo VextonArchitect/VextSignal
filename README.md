@@ -15,28 +15,35 @@ Built with performance, flexibility, and scalability in mind.
 
 ## 🏆 World-Class Performance
 
-| Mode             | Execution Model       | Performance | Latency      | Safety    | Memory Usage  | Behavior                          | Best Use Case                          |
-| ---------------- | --------------------- | ----------- | ------------ | --------- | ------------- | --------------------------------- | -------------------------------------- |
-| **FireHyper**    | Direct call (`pcall`) | 🔥 Maximum  | ⚡ Ultra low  | ⚠️ Medium| 🟢 Minimal    | Synchronous, blocking            | Hitboxes, combat core, tight loops     |
-| **FireSecure**   | Coroutine pool        | ⚡ Very high| ⚡ Low       | 🛡️ High  | 🟡 Controlled | Async with pooled threads        | Heavy systems, recursion, stress logic |
-| **Fire**         | `task.spawn`          | ⚖️ Medium   | ⏳ Medium     | 🛡️ High  | 🔴 Higher     | Async, new thread per call        | General gameplay, UI, standard events |
-| **FireDeferred** | `task.defer`          | ⚖️ Medium   | ⏳ Next frame | 🛡️ High  | 🟡 Medium     | Deferred execution (end of frame) | UI updates, cleanup, batching         |
+| Mode             | Execution Model | Speed        | Safety    | Latency     | Overhead    | Description                           |
+| ---------------- | --------------- | ------------ | --------- | ----------- | ----------- | ------------------------------------- |
+| **FireHyper**    | direct (pcall)  | 🔥 highest   | ⚠️ medium | ⚡ ultra low | 🟢 minimal  | direct execution without scheduler    |
+| **FireSecure**   | coroutine pool  | 🚀 very high | 🛡️ high  | ⚡ very low  | 🟡 low      | uses reusable threads (no spawn spam) |
+| **Fire**         | task.spawn      | ⚖️ medium    | 🛡️ high  | ⏳ medium    | 🟡 moderate | default Roblox async execution        |
+| **FireDeferred** | task.defer      | ⚖️ medium    | 🛡️ high  | ⏳ delayed   | 🟡 moderate | executes on next frame                |
 
 ---
 
-| Test Scenario        | Total Calls | Execution Time | Throughput         |
-| -------------------- | ----------- | -------------- | ------------------ |
-| Extreme Test (Run 1) | 90,092,700  | 9.96 s         | ~9,000,000 ops/sec |
-| Extreme Test (Run 2) | 29,062,500  | 8.75 s         | ~3,300,000 ops/sec |
+| Test Case      | Total Calls | Time   | Throughput     |
+| -------------- | ----------- | ------ | -------------- |
+| **Extreme Test(Hyper)** | 90,092,700  | 9.97 s | ~9.03M ops/sec |
+| **Extreme Test(Secure)** | 29,062,500  | 8.75 s | ~3.32M ops/sec |
 
 ---
 
-| Category      | Best Mode      |
-| ------------- | -------------- |
-| Max Speed     | 🔥 FireHyper   |
-| Best Balance  | ⚡ FireSecure   |
-| Default Safe  | ⚙️ Fire        |
-| Delayed Logic | ⏳ FireDeferred |
+| Category          | Winner          | Why                            |
+| ----------------- | --------------- | ------------------------------ |
+| **Max Speed**     | 🥇 FireHyper    | no scheduler, no threads       |
+| **Best Balance**  | 🥇 FireSecure   | high speed + stable under load |
+| **Most Safe**     | 🥇 Fire         | Roblox default behavior        |
+| **Frame Control** | 🥇 FireDeferred | prevents frame spikes          |
+
+🧠 Quick Summary
+FireHyper → raw speed, no safety net
+FireSecure → optimized + stable
+Fire → simple and safe
+FireDeferred → delayed execution
+
 
 ---
 
