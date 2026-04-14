@@ -1,6 +1,6 @@
 --!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local VextSignal = require(ReplicatedStorage.Shared.Systems.VextSignal.Src.SignalService) -- path to signal module
+local VextSignal = require(ReplicatedStorage.Shared) -- path to signal module
 
 print("\n[VextSignal]: Starting EXTREME STRESS TEST...")
 print("--------------------------------------------------")
@@ -64,7 +64,7 @@ local function RunExtremeTest()
 	local large_data = table.create(1000, "Vext_Power")
 
 	-- number of parallel waves
-	local waves = 1800
+	local waves = 9000
 
 	print(string.format("running %d stress waves...", waves))
 
