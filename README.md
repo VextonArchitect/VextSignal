@@ -54,7 +54,6 @@ VextSignal is optimized to the theoretical limits of the Luau VM.
 To use VextSignal, simply require the module and create a new instance.
 ```lua
 local VextSignal = require(game:GetService("ReplicatedStorage").VextSignal)
-
 -- Create the signal
 local onHit = VextSignal.new()```
 
