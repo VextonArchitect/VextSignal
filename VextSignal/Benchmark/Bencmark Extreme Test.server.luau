@@ -1,5 +1,3 @@
---!strict
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VextSignal = require(ReplicatedStorage.Shared.Systems.VextSignal.Src.SignalService)
 
