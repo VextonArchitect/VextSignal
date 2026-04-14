@@ -34,15 +34,15 @@ VextSignal is ideal for:
 ---
 
 ## 💎 Key Features
-1. 📊 Built-in Debug Profiler
+* 1. 📊 Built-in Debug Profiler
 A developer-only mode that tracks how many times each signal is fired, the average execution time of listeners, and identifies "heavy" handlers that might be causing frame drops.
 
 Useful for optimizing high-frequency combat events in large-scale games.
 
-2. 🛡️ Argument Validation Layer
+* 2. 🛡️ Argument Validation Layer
 Optional runtime checks for signals. If enabled, it will throw an error if a script tries to fire the signal with incorrect argument types, helping catch bugs in non-strict environments.
 
-3. 🌐 Native Bridge (Cross-Boundary Signals)
+* 3. 🌐 Native Bridge (Cross-Boundary Signals)
 A middleware system that allows a VextSignal to automatically wrap a RemoteEvent.
 
 `Signal:FireClient(player, ...)`
@@ -51,13 +51,13 @@ A middleware system that allows a VextSignal to automatically wrap a RemoteEvent
 
 Seamlessly handle the transition from server logic to client UI.
 
-4. ⏳ Promise Integration
+* 4. ⏳ Promise Integration
 Standardized Signal:WaitPromise() method that returns a Promise. This would allow developers to use the library alongside popular Promise libraries for better async flow control (e.g., Signal:WaitPromise():andThen(...)).
 
-5. 🛠️ Signal Groups (Batch Disconnect)
+* 5. 🛠️ Signal Groups (Batch Disconnect)
 The ability to group multiple signals together (e.g., all signals related to a specific NPC). When the NPC is destroyed, you can call Group:DisconnectAll() to clean up everything at once, reducing boilerplate code.
 
-6. 🔄 Middleware Support
+* 6. 🔄 Middleware Support
 The ability to "intercept" a signal before it reaches listeners.
 
 Example: A middleware that logs every combat hit to a global analytics service without modifying the original combat scripts.
