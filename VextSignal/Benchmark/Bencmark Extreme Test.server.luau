@@ -1,6 +1,7 @@
 --!strict
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
--- Ensure the path points to your SignalService module
+-- ensure correct module path for signal system
 local VextSignal = require(ReplicatedStorage.Shared)
 
 print("\n[VextSignal]: Initializing Benchmark extreme test...")
@@ -16,28 +17,31 @@ local Stats = {
 	SelfDestructs = 0,
 }
 
--- 1. // Layer: dynamic chaos (self-modifying listeners)
--- Treates 500 listeners that disconnect themselves and create new ones during execution.
--- Tests if the linked-list can handle mid-cycle mutations without skipping nodes.
+-- layer 1: dynamic chaos (self-modifying listeners)
+-- 500 listeners that disconnect and recreate themselves during execution
+-- tests list stability under mutation while iterating
 for i = 1, 500 do
 	local connection
 	connection = ChaosSignal:Connect(function()
 		Stats.TotalCalls += 1
 		Stats.SelfDestructs += 1
-		connection:Disconnect() -- kill current connection
 
-		-- Instantly create a new connection in the same thread
+		-- remove current listener during execution
+		connection:Disconnect()
+
+		-- immediately spawn replacement listener
 		ChaosSignal:Connect(function()
 			Stats.TotalCalls += 1
 		end)
 	end)
 end
 
--- 2. // Layer: cross-recursion (circular dependency)
--- Signal a triggers signal b, which triggers a again.
--- Tests the thread pool management and stack safety.
+-- layer 2: circular recursion (cross-signal dependency)
+-- root triggers chaos, chaos triggers root again
+-- tests recursion safety + thread handling
 RootSignal:Connect(function(level: number)
 	Stats.TotalCalls += 1
+
 	if level < 30 then
 		ChaosSignal:Fire()
 		RootSignal:Fire(level + 1)
@@ -48,32 +52,35 @@ ChaosSignal:Connect(function()
 	Stats.DeepInvocations += 1
 end)
 
--- 3. // Layer: heavy payload (memory stress)
--- Passes large tables to ensure coroutines handle data allocation/garbage collection efficiently.
+-- layer 3: heavy payload stress
+-- large tables passed through signal pipeline to stress memory + GC
 CleanupSignal:Connect(function(data: { string })
 	Stats.TotalCalls += 1
-	local _junk = #data -- simulate data processing
+
+	-- simulate real workload on received payload
+	local _junk = #data
 end)
 
--- // Core execution: benchmark extreme test
+-- core benchmark execution
 local function RunExtremeTest()
 	local start_time = os.clock()
-	local large_data = table.create(1000, "Vext_Power") -- Heavy memory argument
+	local large_data = table.create(1000, "Vext_Power")
 
 	print("Executing 2,200 recursive waves with heavy payloads...")
 
 	for i = 1, 2200 do
-		-- Trigger chain reactions in parallel threads
+		-- spawn parallel execution waves
 		task.spawn(function()
 			RootSignal:Fire(1)
 			CleanupSignal:Fire(large_data)
 		end)
 	end
 
-	-- Allow time for asynchronous tasks to settle
+	-- allow async operations to finish
 	task.wait(3)
 
-	local duration = os.clock() - start_time - 3 -- Subtract wait time
+	local duration = os.clock() - start_time - 3
+
 	print("--------------------------------------------------")
 	print("Benchmark extreme test results:")
 	print(string.format(" > total processed calls: %d", Stats.TotalCalls))
@@ -83,7 +90,9 @@ local function RunExtremeTest()
 	print("--------------------------------------------------")
 end
 
+-- small warmup delay before heavy execution
 task.wait(1)
+
 local success, err = pcall(RunExtremeTest)
 
 if not success then
@@ -92,7 +101,7 @@ else
 	print("[Vext Success]: Architectural integrity maintained under extreme chaos.")
 end
 
--- Cleanup
+-- cleanup phase
 task.delay(1, function()
 	RootSignal:Destroy()
 	ChaosSignal:Destroy()
