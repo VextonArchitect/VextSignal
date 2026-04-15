@@ -106,7 +106,6 @@ Benchmarks were conducted under controlled conditions:
 ### Manual
 
 Place the module in `ReplicatedStorage`
-
 ### Rojo
 
 Add the module to your `src` directory
