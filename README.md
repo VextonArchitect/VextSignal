@@ -37,13 +37,6 @@ VextSignal continues to evolve with focus on performance, scalability, and tooli
 | **RemoteSignal Integration** | ⏳ Planned | High-performance client-server networking layer |
 | **Payload Validation** | ⏳ Planned | Runtime validation for signal arguments |
 | **Visual Profiler** | 🚧 In Progress | Studio tool for tracing and performance analysis |
-### ✅ Completed
-
-| Feature | Version | Description |
-|----------|--------|-------------|
-| VextSignal Core | v1.0.0 | High-performance signal system with priority execution |
-| Bridge System | v1.0.0 | Event orchestration layer (Static / Dynamic / Scoped) |
-
 ## 💡 Summary
 
 Focused on building a scalable, high-performance event ecosystem for Roblox systems.
