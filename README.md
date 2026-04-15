@@ -1,22 +1,22 @@
 # ⚡ VextSignal
 
-A high-performance, extensible signal system for Roblox (Luau), designed for high-frequency gameplay systems such as combat, hitboxes, AI, and networking.
+A high-performance, extensible signal system for Roblox (Luau), built for high-frequency systems such as combat, hit detection, AI, and networking.
 
 ---
 
 ## 📌 Overview
 
-| Category       | Description                      |
-| -------------- | -------------------------------- |
-| Project Type   | Signal / Event System            |
-| Target Engine  | Roblox (Luau)                    |
-| Primary Use    | Combat, Hitboxes, AI, Networking |
-| Alternative To | BindableEvent                    |
-| Design Focus   | Performance + Control            |
+| Category       | Description                       |
+| -------------- | --------------------------------- |
+| Project Type   | Signal / Event System             |
+| Engine         | Roblox (Luau)                     |
+| Primary Use    | Combat, Hitboxes, AI, Networking  |
+| Alternative To | BindableEvent                     |
+| Focus          | Performance, determinism, control |
 
 ---
 
-## 🏷️ Project Status
+## 🏷️ Status
 
 | Metric   | Value              |
 | -------- | ------------------ |
@@ -27,160 +27,201 @@ A high-performance, extensible signal system for Roblox (Luau), designed for hig
 
 ---
 
-## ⚙️ Core Design Goals
+## ⚙️ Design Goals
 
-| Goal            | Description                       |
-| --------------- | --------------------------------- |
-| Low Allocation  | Minimize GC pressure in hot paths |
-| High Throughput | Handle extreme event spam         |
-| Determinism     | Predictable execution order       |
-| Flexibility     | Multiple execution models         |
-| Debuggability   | Middleware + instrumentation      |
+| Goal            | Description                                         |
+| --------------- | --------------------------------------------------- |
+| Low Overhead    | Minimal allocations in hot execution paths          |
+| High Throughput | Handles high-frequency event dispatch efficiently   |
+| Determinism     | Predictable execution order via priority system     |
+| Flexibility     | Multiple execution strategies depending on use case |
+| Control         | Explicit lifecycle and memory management            |
 
 ---
 
-## 🚀 Execution Models
+## 🚀 Execution Modes
 
-| Mode         | Strategy       | Latency    | Safety | Use Case           |
-| ------------ | -------------- | ---------- | ------ | ------------------ |
-| FireHyper    | Direct pcall   | Ultra Low  | Medium | Combat / Hitboxes  |
-| FireSecure   | Coroutine pool | Low        | High   | Complex logic      |
-| Fire         | task.spawn     | Medium     | High   | General events     |
-| FireDeferred | task.defer     | Next frame | High   | Cleanup / batching |
+| Mode           | Strategy       | Latency    | Notes                            |
+| -------------- | -------------- | ---------- | -------------------------------- |
+| `FireHyper`    | Direct `pcall` | Ultra Low  | Fastest, synchronous             |
+| `FireSecure`   | Coroutine pool | Low        | Balanced performance & isolation |
+| `Fire`         | `task.spawn`   | Medium     | General-purpose async            |
+| `FireDeferred` | `task.defer`   | Next Frame | Useful for batching / cleanup    |
 
 ---
 
 ## 🧠 Core Features
 
-| Feature               | Description                          |
-| --------------------- | ------------------------------------ |
-| Middleware System     | Intercept / modify / block execution |
-| Priority System       | Deterministic listener ordering      |
-| Strict Typing         | Runtime argument validation          |
-| VextGroups            | Batch connection management          |
-| Cross-Boundary Bridge | Server ↔ Client unified API          |
+* ⚡ Priority-based listener execution (deterministic order)
+* 🔁 Multiple execution models (sync + async strategies)
+* 🧵 Coroutine pooling to reduce allocation under load
+* 🧹 Explicit memory control (manual disconnect & cleanup)
+* 🎯 Minimal abstraction overhead (no Instances, no BindableEvents)
 
 ---
 
-## 📊 Benchmark Methodology
+## 📊 Benchmark Notes
+
+Benchmarks were conducted under controlled conditions:
 
 | Category    | Details                        |
 | ----------- | ------------------------------ |
-| Environment | Roblox Studio / Luau VM        |
-| Test Setup  | Empty place, no rendering load |
-| Load Type   | High-frequency signal spam     |
-| Duration    | 10–30 seconds continuous run   |
+| Environment | Roblox Studio (Luau VM)        |
+| Scenario    | High-frequency signal dispatch |
+| Duration    | 10–30 seconds continuous load  |
 | Scale       | 1M – 10M signal fires          |
+
+> Results may vary depending on workload and execution mode.
 
 ---
 
 ## 📦 Installation
 
-| Method | Steps                             |
-| ------ | --------------------------------- |
-| Manual | Place module in ReplicatedStorage |
-| Rojo   | Add module to src directory       |
+### Manual
+
+Place the module in `ReplicatedStorage`
+
+### Rojo
+
+Add the module to your `src` directory
 
 ---
 
 ## 🧩 Basic Usage
 
-| Step    | Code                                                       |
-| ------- | ---------------------------------------------------------- |
-| Require | `local VextSignal = require(ReplicatedStorage.VextSignal)` |
-| Create  | `local signal = VextSignal.new()`                          |
+```lua
+local VextSignal = require(ReplicatedStorage.VextSignal)
+
+local signal = VextSignal.new()
+
+signal:Connect(function(msg)
+	print(msg)
+end)
+
+signal:Fire("Hello World")
+```
 
 ---
 
-## 🔗 API Reference
+## 🔗 API
 
-| Function                | Description          |
-| ----------------------- | -------------------- |
-| `new()`                 | Creates a signal     |
-| `Connect(fn, priority)` | Adds listener        |
-| `Once(fn)`              | One-time listener    |
-| `FireHyper(...)`        | Fast sync execution  |
-| `FireSecure(...)`       | Safe async execution |
-| `Fire(...)`             | Standard async       |
-| `FireDeferred(...)`     | Next-frame execution |
-| `Disconnect()`          | Removes connection   |
-| `Destroy()`             | Cleans signal        |
+### Creation
+
+```lua
+local signal = VextSignal.new()
+```
 
 ---
 
-## ⚡ Connection Example
+### Connections
 
-| Type     | Code                                |
-| -------- | ----------------------------------- |
-| Normal   | `signal:Connect(function(...) end)` |
-| Priority | `signal:Connect(fn, 100)`           |
-| Once     | `signal:Once(fn)`                   |
-
----
-
-## 🚀 Firing Signals
-
-| Mode     | Code                       |
-| -------- | -------------------------- |
-| Hyper    | `signal:FireHyper(...)`    |
-| Secure   | `signal:FireSecure(...)`   |
-| Standard | `signal:Fire(...)`         |
-| Deferred | `signal:FireDeferred(...)` |
+```lua
+signal:Connect(fn, priority?)
+signal:Once(fn, priority?)
+```
 
 ---
 
-## 🧠 Middleware
+### Firing
 
-| Concept   | Example                                                |
-| --------- | ------------------------------------------------------ |
-| Intercept | `signal:Use(function(next, ...) return next(...) end)` |
-| Modify    | Change arguments before passing forward                |
-| Block     | Stop execution chain                                   |
+```lua
+signal:FireHyper(...)
+signal:FireSecure(...)
+signal:Fire(...)
+signal:FireDeferred(...)
+```
 
 ---
 
-## 🧹 Signal Groups
+### Lifecycle
 
-| Action  | Code                                     |
-| ------- | ---------------------------------------- |
-| Create  | `local group = VextSignal.createGroup()` |
-| Add     | `group:Add(signal:Connect(fn))`          |
-| Cleanup | `group:DisconnectAll()`                  |
+```lua
+connection:Disconnect()
+signal:DisconnectAll()
+signal:Destroy()
+```
+
+---
+
+### Yielding
+
+```lua
+local result = signal:Wait()
+```
+
+---
+
+## ⚡ Example
+
+```lua
+local signal = VextSignal.new()
+
+signal:Connect(function()
+	print("Low priority")
+end, 0)
+
+signal:Connect(function()
+	print("High priority")
+end, 100)
+
+signal:FireHyper()
+```
+
+**Output:**
+
+```
+High priority
+Low priority
+```
 
 ---
 
 ## 🆚 Comparison
 
-| Feature        | VextSignal      | BindableEvent |
-| -------------- | --------------- | ------------- |
-| Performance    | High            | Medium        |
-| Middleware     | Yes             | No            |
-| Priority       | Yes             | No            |
-| Async Modes    | Multiple        | Single        |
-| Debug Tools    | Yes             | No            |
-| Memory Control | Manual + Groups | GC only       |
+| Feature        | VextSignal | BindableEvent |
+| -------------- | ---------- | ------------- |
+| Performance    | High       | Medium        |
+| Determinism    | Yes        | No            |
+| Priority       | Yes        | No            |
+| Async Control  | Multiple   | Single        |
+| Memory Control | Manual     | GC only       |
 
 ---
 
 ## 🛣️ Roadmap
 
-| Feature            | Status         |
-| ------------------ | -------------- |
-| Visual Profiler UI | In Development |
-| Network Batching   | Planned        |
-| Auto Cleanup       | Planned        |
-| Native Buffering   | Research       |
-| Analytics Hooks    | Research       |
+| Feature             | Status      |
+| ------------------- | ----------- |
+| Middleware System   | Planned     |
+| Visual Profiler     | In Progress |
+| Network Abstraction | Planned     |
+| Auto Cleanup        | Planned     |
 
 ---
 
 ## 🧠 Summary
 
-| Aspect   | Description                    |
-| -------- | ------------------------------ |
-| Purpose  | High-performance signal system |
-| Strength | Control + speed + scalability  |
-| Target   | High-frequency Roblox systems  |
+**VextSignal** is designed for developers who need:
+
+* precise control over execution
+* predictable behavior under load
+* and minimal overhead in performance-critical systems
+
+It is especially suited for:
+
+* combat systems
+* hit detection
+* real-time AI
+* high-frequency event pipelines
+
+---
+
+## ⚠️ Notes
+
+* `FireHyper` is synchronous and may block execution
+* `FireSecure` introduces small overhead due to argument packing
+* Performance characteristics depend on usage patterns
+* Not a drop-in replacement for all BindableEvent use cases
 
 ---
 
