@@ -25,6 +25,36 @@ A high-performance, extensible signal system for Roblox (Luau), built for high-f
 | Language | Luau               |
 | Platform | Roblox             |
 
+
+## 🛣️ Roadmap
+
+### 🚧 In Development
+
+| Feature | Status | Description |
+|----------|--------|-------------|
+| Middleware System | 🟡 Planned | Add before/after event hooks for signal control |
+| Network Layer | 🟡 Planned | Client-server event synchronization system |
+| Auto Cleanup | 🟡 Planned | Automatic memory-safe signal cleanup |
+| Event Tracing Debug | 🟡 Planned | Real-time event flow debugging tools |
+| Bridge v2 (Typed Core) | 🟡 Planned | Fully strict typed rewrite of Bridge system |
+
+---
+
+### ⚙️ In Progress
+
+| Feature | Status | Description |
+|----------|--------|-------------|
+| Visual Profiler | 🔵 In Progress | Runtime visualization of signal execution flow |
+
+---
+
+### ✅ Completed
+
+| Feature | Version | Description |
+|----------|--------|-------------|
+| VextSignal Core | v1.0.0 | High-performance signal system with priority execution |
+| Bridge System | v1.0.0 | Event orchestration layer (Static / Dynamic / Scoped) |
+
 ---
 
 ## ⚙️ Design Goals
@@ -50,16 +80,6 @@ A high-performance, extensible signal system for Roblox (Luau), built for high-f
 
 ---
 
-## 🧠 Core Features
-
-* ⚡ Priority-based listener execution (deterministic order)
-* 🔁 Multiple execution models (sync + async strategies)
-* 🧵 Coroutine pooling to reduce allocation under load
-* 🧹 Explicit memory control (manual disconnect & cleanup)
-* 🎯 Minimal abstraction overhead (no Instances, no BindableEvents)
-
----
-
 ## 📊 Benchmark Notes
 
 Benchmarks were conducted under controlled conditions:
@@ -72,6 +92,28 @@ Benchmarks were conducted under controlled conditions:
 | Scale       | 1M – 10M signal fires          |
 
 > Results may vary depending on workload and execution mode.
+
+---
+
+## 🆚 Comparison
+
+| Feature        | VextSignal | BindableEvent |
+| -------------- | ---------- | ------------- |
+| Performance    | High       | Medium        |
+| Determinism    | Yes        | No            |
+| Priority       | Yes        | No            |
+| Async Control  | Multiple   | Single        |
+| Memory Control | Manual     | GC only       |
+
+---
+
+## 🧠 Core Features
+
+* ⚡ Priority-based listener execution (deterministic order)
+* 🔁 Multiple execution models (sync + async strategies)
+* 🧵 Coroutine pooling to reduce allocation under load
+* 🧹 Explicit memory control (manual disconnect & cleanup)
+* 🎯 Minimal abstraction overhead (no Instances, no BindableEvents)
 
 ---
 
@@ -173,29 +215,6 @@ signal:FireHyper()
 High priority
 Low priority
 ```
-
----
-
-## 🆚 Comparison
-
-| Feature        | VextSignal | BindableEvent |
-| -------------- | ---------- | ------------- |
-| Performance    | High       | Medium        |
-| Determinism    | Yes        | No            |
-| Priority       | Yes        | No            |
-| Async Control  | Multiple   | Single        |
-| Memory Control | Manual     | GC only       |
-
----
-
-## 🛣️ Roadmap
-
-| Feature             | Status      |
-| ------------------- | ----------- |
-| Middleware System   | Planned     |
-| Visual Profiler     | In Progress |
-| Network Abstraction | Planned     |
-| Auto Cleanup        | Planned     |
 
 ---
 
