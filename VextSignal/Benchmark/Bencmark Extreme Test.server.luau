@@ -151,7 +151,7 @@ print("  connections tested : 1000 connect / 1000 disconnect")
 local payload = table.create(1500, "vext")
 local gc_before = gcinfo()
 
-for i = 1, 80_000 do
+for i = 1, 80000 do
 	hyper:FireHyper(payload)
 end
 
