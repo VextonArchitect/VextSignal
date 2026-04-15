@@ -12,10 +12,10 @@ local VextSignal = require(ReplicatedStorage.Shared.Systems.VextSignal.Src.Signa
 
 -- config
 
-local iterations = 1_500_000
-local batch_size = 5_000
+local iterations = 1500000
+local batch_size = 5000
 local latency_samples = 150
-local warmup = 30_000
+local warmup = 30000
 
 -- signals
 
@@ -84,11 +84,11 @@ end
 
 local secure_time = measure(secure, function(s, i)
 	s:FireSecure(i)
-end, 200_000)
+end, 200000)
 
 local standard_time = measure(standard, function(s, i)
 	s:Fire(i)
-end, 200_000)
+end, 200000)
 
 print("\nphase 2 • execution cost comparison")
 print(string.format("  secure   (200k) : %.6f sec", secure_time))
