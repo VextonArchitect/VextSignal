@@ -38,7 +38,6 @@ VextSignal continues to evolve with focus on performance, scalability, and tooli
 | **Payload Validation** | ⏳ Planned | Runtime validation for signal arguments |
 | **Visual Profiler** | 🚧 In Progress | Studio tool for tracing and performance analysis |
 ## 💡 Summary
-
 Focused on building a scalable, high-performance event ecosystem for Roblox systems.
 ---
 
