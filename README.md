@@ -1,6 +1,6 @@
-# ⚡ VextSignal
+# ⚡VextSignal
 
-A high-performance, extensible signal system for Roblox (Luau), built for high-frequency systems such as combat, hit detection, AI, and networking.
+A high-performance, extensible signal system for Roblox (Luau), built for high-frequency systems such as combat, hit detection, AI, UI, and networking.
 
 ---
 
