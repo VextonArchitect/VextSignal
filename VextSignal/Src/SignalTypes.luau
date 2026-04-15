@@ -15,9 +15,9 @@ export type Node<T...> = {
 	Connected: boolean,
 	Priority: number,
 
-	_signal: any,
-	_next: any,
-	_prev: any,
+	_signal: Signal<T...>?,
+	_next: Node<T...>?,
+	_prev: Node<T...>?,
 
 	-- handler function (can be nil after disconnect for gc)
 	_fn: ((T...) -> ())?,
@@ -55,6 +55,10 @@ export type Signal<T...> = {
 
 	-- fully clears the signal and releases resources
 	Destroy: (self: Signal<T...>) -> (),
+}
+
+export type SignalClass = {
+	new: <T...>() -> Signal<T...>,
 }
 
 return {}
