@@ -25,22 +25,18 @@ A high-performance, extensible signal system for Roblox (Luau), built for high-f
 | Language | Luau               |
 | Platform | Roblox             |
 
+---
+## 🛣️ Roadmap (Future Updates)
 
-## 🛣️ Roadmap
-### 🚧 In Development
-
-| Feature | Status | Description |
-|----------|--------|-------------|
-| Middleware System | 🟡 Planned | Add before/after event hooks for signal control |
-| Network Layer | 🟡 Planned | Client-server event synchronization system |
-| Auto Cleanup | 🟡 Planned | Automatic memory-safe signal cleanup |
-| Event Tracing Debug | 🟡 Planned | Real-time event flow debugging tools |
-| Bridge v2 (Typed Core) | 🟡 Planned | Fully strict typed rewrite of Bridge system |
-### ⚙️ In Progress
+VextSignal continues to evolve with focus on performance, scalability, and tooling.
 
 | Feature | Status | Description |
 |----------|--------|-------------|
-| Visual Profiler | 🔵 In Progress | Runtime visualization of signal execution flow |
+| **Signal Bridge** | ✅ Released | Centralized event system with namespaces |
+| **Middleware System** | ⏳ Planned | Intercept and control event execution flow |
+| **RemoteSignal Integration** | ⏳ Planned | High-performance client-server networking layer |
+| **Payload Validation** | ⏳ Planned | Runtime validation for signal arguments |
+| **Visual Profiler** | 🚧 In Progress | Studio tool for tracing and performance analysis |
 ### ✅ Completed
 
 | Feature | Version | Description |
@@ -48,6 +44,9 @@ A high-performance, extensible signal system for Roblox (Luau), built for high-f
 | VextSignal Core | v1.0.0 | High-performance signal system with priority execution |
 | Bridge System | v1.0.0 | Event orchestration layer (Static / Dynamic / Scoped) |
 
+## 💡 Summary
+
+Focused on building a scalable, high-performance event ecosystem for Roblox systems.
 ---
 
 ## ⚙️ Design Goals
@@ -122,22 +121,6 @@ Add the module to your `src` directory
 
 ---
 
-## 🧩 Basic Usage
-
-```lua
-local VextSignal = require(ReplicatedStorage.VextSignal)
-
-local signal = VextSignal.new()
-
-signal:Connect(function(msg)
-	print(msg)
-end)
-
-signal:Fire("Hello World")
-```
-
----
-
 ## 🔗 API
 
 ### Creation
@@ -151,7 +134,7 @@ local signal = VextSignal.new()
 ### Connections
 
 ```lua
-signal:Connect(fn, priority?)
+signal:Connect(fn, priority?) -- priority defaults to 0. Higher runs first.
 signal:Once(fn, priority?)
 ```
 
