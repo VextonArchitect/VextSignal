@@ -27,7 +27,6 @@ A high-performance, extensible signal system for Roblox (Luau), built for high-f
 
 
 ## 🛣️ Roadmap
-
 ### 🚧 In Development
 
 | Feature | Status | Description |
@@ -37,17 +36,11 @@ A high-performance, extensible signal system for Roblox (Luau), built for high-f
 | Auto Cleanup | 🟡 Planned | Automatic memory-safe signal cleanup |
 | Event Tracing Debug | 🟡 Planned | Real-time event flow debugging tools |
 | Bridge v2 (Typed Core) | 🟡 Planned | Fully strict typed rewrite of Bridge system |
-
----
-
 ### ⚙️ In Progress
 
 | Feature | Status | Description |
 |----------|--------|-------------|
 | Visual Profiler | 🔵 In Progress | Runtime visualization of signal execution flow |
-
----
-
 ### ✅ Completed
 
 | Feature | Version | Description |
