@@ -54,6 +54,7 @@ end
 local Connection = {}
 Connection.__index = Connection
 
+-- disconnects this listener from the signal
 function Connection.Disconnect(self: any)
 	if not (self and self.Connected) then
 		return
@@ -89,7 +90,6 @@ Signal.__index = Signal
 function Signal.new<T...>(): Signal<T...>
 	return setmetatable({
 		_handlerListHead = nil,
-		_firing = false, -- reserved for re-entrancy protection
 	}, Signal) :: any
 end
 
@@ -158,7 +158,7 @@ local function FireSecure(self: any, ...: any)
 end
 (Signal :: any).FireSecure = FireSecure
 
--- fire using task.spawn (fast, no table allocations)
+-- fire using task.spawn (fast, async)
 function Signal.Fire<T...>(self: any, ...: T...)
 	local item = (self :: any)._handlerListHead :: InternalNode?
 
@@ -193,7 +193,7 @@ function Signal.FireHyper<T...>(self: any, ...: T...)
 	end
 end
 
--- fire at end of frame
+-- fire at end of frame using task.defer
 local function FireDeferred(self: any, ...: any)
 	local item = self._handlerListHead :: InternalNode?
 	if not item then
@@ -233,7 +233,7 @@ function Signal.Once<T...>(self: any, func: (T...) -> (), priority: number?): Co
 	return connection
 end
 
--- yields until signal fires
+-- yields until the signal fires and returns passed arguments
 function Signal.Wait<T...>(self: any): T...
 	local runningThread = coroutine.running();
 
@@ -260,10 +260,10 @@ function Signal.DisconnectAll(self: any)
 	(self :: any)._handlerListHead = nil
 end
 
--- destroys the signal
+-- fully clears the signal and releases resources
 function Signal.Destroy(self: any)
 	(self :: any):DisconnectAll()
 	setmetatable(self :: any, nil)
 end
 
-return Signal :: any
+return (Signal :: any) :: Types.SignalClass
